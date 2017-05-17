@@ -6,8 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/",
-    "build-browser": "rollup -c rollup.config.js",
-    "build": "npm run clean && npm run lint && npm run build-browser",
+    "build:js": "rollup -c rollup.config.js",
+    "build": "npm run --silent lint && npm run --silent build:js",
+    "_watch:dev": "chokidar 'src/**/*.js' -c 'npm run --silent build'",
+    "_watch:dev:nolint": "chokidar 'src/**/*.js' -c 'npm run --silent build:js'",
+    "_livereload": "live-server --watch=./lib",
+    "dev": "parallelshell 'npm run _watch:dev' 'npm run _livereload'",
+    "dev:nolint": "parallelshell 'npm run _watch:dev:nolint' 'npm run _livereload'",
     "clean": "rm -Rf lib/*",
     "prepublish": "npm run build"
   },
@@ -18,9 +23,13 @@
     "babel-eslint": "^7.2.3",
     "babel-preset-babili": "0.0.12",
     "babel-preset-es2015": "^6.24.1",
+    "chokidar-cli": "^1.2.0",
     "eslint": "^3.19.0",
+    "live-server": "^1.2.0",
+    "parallelshell": "^2.0.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
-    "rollup-plugin-babili": "^3.0.0"
+    "rollup-plugin-babili": "^3.0.0",
+    "rollup-watch": "^3.2.2"
   }
 }
