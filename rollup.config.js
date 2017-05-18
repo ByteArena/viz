@@ -23,8 +23,8 @@ export default {
     "format": "iife",
     "moduleName": "bytearenaviz",
     "sourceMap": true,
-    "external": ['three'],
+    "external": ['babylonjs'],
     "globals": {
-      "three": 'THREE',
+      "babylonjs": 'BABYLON',
     }
 }
