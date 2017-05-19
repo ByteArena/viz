@@ -3,12 +3,9 @@
 import { Engine } from 'babylonjs';
 
 import createScene from './scene';
-/*import createRenderer from './renderer';
-import createCamera from './camera';*/
-
 
 const canvas = document.getElementById('renderCanvas');
-const engine = new Engine(canvas, true);
+const engine = new Engine(canvas, true);    // true: webgl AA
 engine.enableOfflineSupport = false; // disable mesh in-browser cache (and the 404 error for manifest files)
 console.log(engine.getRenderingCanvasClientRect());
 
@@ -18,21 +15,13 @@ engine.runRenderLoop(function() {
     scene.render();
 });
 
-/*const renderer = createRenderer({ getDimensions });
-const camera = createCamera({ getDimensions });
+document.getElementById("debug").addEventListener("click", () => scene._.toggleDebug());
 
-window.addEventListener('resize', function() {
-    const { width, height } = getDimensions();
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-}, false);
+document.getElementById("topview").addEventListener("click", () => scene._.setTopView());
+document.getElementById("isoview").addEventListener("click", () => scene._.setISOView());
+document.getElementById("frontview").addEventListener("click", () => scene._.setFrontView());
 
-const render = () => {
-    scene.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(render);
-};
-
-requestAnimationFrame(render);
-*/
+document.getElementById("cam-left").addEventListener("click", () => scene._.panLeft());
+document.getElementById("cam-right").addEventListener("click", () => scene._.panRight());
+document.getElementById("cam-up").addEventListener("click", () => scene._.panUp());
+document.getElementById("cam-down").addEventListener("click", () => scene._.panDown());

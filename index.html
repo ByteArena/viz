@@ -9,6 +9,7 @@ html, body {
     height  : 100%;
     margin  : 0;
     padding : 0;
+    background: silver;
 }
 
 #renderCanvas {
@@ -16,14 +17,44 @@ html, body {
     height  : 100%;
     touch-action: none;
 }
+
+#controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+#screenspacepoint {
+    position: absolute;
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    background-color: red;
+    margin-left: -5px;
+    margin-top: -5px;
+}
 </style>
 </head>
 <body>
 
 <canvas id="renderCanvas"></canvas>
+<div id="controls">
+    <button id="debug">debug</button>
+    <button id="topview">Top view</button>
+    <button id="frontview">Front view</button>
+    <button id="isoview">ISO</button>
+    <button id="cam-left">📹 ←</button>
+    <button id="cam-right">📹 →</button>
+    <button id="cam-up">📹 ↑</button>
+    <button id="cam-down">📹 ↓</button>
+</div>
+
+<div id="screenspacepoint"></div>
 
 <!--  Our code  -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/2.5.0/babylon.js"></script>
+<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.gridMaterial.min.js"></script>
 <script src="lib/bytearenaviz.min.js"></script>
 </body>
 </html>
