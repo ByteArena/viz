@@ -21,7 +21,12 @@ document.getElementById("topview").addEventListener("click", () => scene._.setTo
 document.getElementById("isoview").addEventListener("click", () => scene._.setISOView());
 document.getElementById("frontview").addEventListener("click", () => scene._.setFrontView());
 
+document.getElementById("zoomin").addEventListener("click", () => scene._.zoomIn());
+document.getElementById("zoomout").addEventListener("click", () => scene._.zoomOut());
+
+/*
 document.getElementById("cam-left").addEventListener("click", () => scene._.panLeft());
 document.getElementById("cam-right").addEventListener("click", () => scene._.panRight());
 document.getElementById("cam-up").addEventListener("click", () => scene._.panUp());
 document.getElementById("cam-down").addEventListener("click", () => scene._.panDown());
+*/

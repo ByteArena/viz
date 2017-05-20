@@ -17,7 +17,6 @@ import { GridMaterial } from 'babylonjs';
 import { Matrix } from 'babylonjs';
 
 
-const cameraVerticalOpeningOrtho = 14;
 const cameraAltitude = 10;
 const shadows = true;
 
@@ -25,37 +24,44 @@ const SQRT2 = Math.sqrt(2);
 const SQRT2_HALF = Math.sqrt(2) / 2;
 const ISOCOEFF = Math.sqrt(1.5);
 
-export default function createScene({ engine, canvas }) {
+class OrthoViewAbstract {
 
-    // This creates a basic Babylon Scene object (non-mesh)
-    const scene = new Scene(engine);
-    scene.clearColor = new Color4(0, 0, 0, 1);
-
-    let isometricLeft = new Vector2(-1.0, 0);
-    let isometricRight = new Vector2(1.0, 0);
-    let isometricDown = new Vector2(0, -1.0);
-    let isometricUp = new Vector2(0, 1.0);
-
-    function project3DToScreenSpace(point3d) {
-        const projected = Vector3.Project(
-            point3d,
-            Matrix.Identity(), 
-            scene.getTransformMatrix(),
-            camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight())
-        );
-
-        return new Vector2(projected.x, projected.y);
+    constructor({ name, camera, verticalopeningortho = 32 }) {
+        this.name = name;
+        this.camera = camera;
+        this.verticalopeningortho = verticalopeningortho;
     }
 
-    function getCameraIsometricPoint() {
-        // determine camera center point
+    isoPointFrom3DPoint(point3d) {
+        return new Vector2(point3d.x, point3d.z);
+    }
 
+    getVerticalOpeningOrtho() {
+        return this.verticalopeningortho;
+    }
+
+    setVerticalOpeningOrtho(verticalopeningortho) {
+        this.verticalopeningortho = verticalopeningortho;
+        return this;
+    }
+
+    getFocusIsoPoint() {
+    }
+
+    activate() {
+    }
+}
+
+class OrthoViewISO extends OrthoViewAbstract {
+
+    getFocusIsoPoint() {
+        const { camera } = this;
         const camerax = (camera.orthoRight + camera.orthoLeft) / 2;
         const cameray = (camera.orthoTop + camera.orthoBottom) / 2;
 
         // http://clintbellanger.net/articles/isometric_math/
-        const cameraxDivTILE_WIDTH_HALF = camerax / isometricRight.x;
-        const camerayDivTILE_HEIGHT_HALF = cameray / isometricUp.y;
+        const cameraxDivTILE_WIDTH_HALF = camerax / (SQRT2 / 2);
+        const camerayDivTILE_HEIGHT_HALF = cameray / (SQRT2_HALF / 2);
         let mapx = (cameraxDivTILE_WIDTH_HALF + camerayDivTILE_HEIGHT_HALF) / 2;
         let mapy = (camerayDivTILE_HEIGHT_HALF - cameraxDivTILE_WIDTH_HALF) / 2;
 
@@ -65,74 +71,60 @@ export default function createScene({ engine, canvas }) {
         return new Vector2(mapx, mapy);
     }
 
-    function threeDPointToIsometricPoint(point3d) {
-        return new Vector2(point3d.x, point3d.z);
+    activate() {
+        this.camera.position = new Vector3(-cameraAltitude*ISOCOEFF, cameraAltitude, -cameraAltitude*ISOCOEFF);
+        this.camera.setTarget(new Vector3(0, 0, 0));
+    }
+}
+
+class OrthoViewFront extends OrthoViewAbstract {
+
+    getFocusIsoPoint() {
+        const { camera } = this; 
+        const camerax = (camera.orthoRight + camera.orthoLeft) / 2;
+        const cameray = (camera.orthoTop + camera.orthoBottom) / 2 / SQRT2_HALF;
+        return new Vector2(camerax, cameray);
     }
 
+    activate() {
+        this.camera.position = new Vector3(-0.000000000000001, cameraAltitude, -cameraAltitude);
+        this.camera.setTarget(new Vector3(0, 0, 0));
+    }
+}
+
+class OrthoViewTop extends OrthoViewAbstract {
+
+    getFocusIsoPoint() {
+        const { camera } = this;
+        const camerax = (camera.orthoRight + camera.orthoLeft) / 2;
+        const cameray = (camera.orthoTop + camera.orthoBottom) / 2;
+        return new Vector2(camerax, cameray);
+    }
+
+    activate() {
+        this.camera.position = new Vector3(0, cameraAltitude, 0);
+        this.camera.setTarget(new Vector3(0, 0, 0));
+    }
+}
+
+export default function createScene({ engine, canvas }) {
+
+    // This creates a basic Babylon Scene object (non-mesh)
+    const scene = new Scene(engine);
+    scene.clearColor = new Color4(0, 0, 0, 1);
+
+    function project3DToScreenSpace(point3d) {
+        const projected = Vector3.Project(
+            point3d,
+            Matrix.Identity(), 
+            scene.getTransformMatrix(),
+            scene.activeCamera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight())
+        );
+
+        return new Vector2(projected.x, projected.y);
+    }
 
     console.log(project3DToScreenSpace);
-    console.log(threeDPointToIsometricPoint);
-    console.log(getCameraIsometricPoint);
-
-    scene._ = {
-        toggleDebug: function() {
-            scene.debugLayer.isVisible() ? scene.debugLayer.hide() : scene.debugLayer.show();
-        },
-        setTopView: function() {
-
-            isometricLeft = new Vector2(-1.0, 0);
-            isometricRight = new Vector2(1.0, 0);
-            isometricDown = new Vector2(0, -1.0);
-            isometricUp = new Vector2(0, 1.0);
-
-            camera.position = new Vector3(0, cameraAltitude, 0);
-            camera.setTarget(new Vector3(0, 0, 0));
-        },
-        setFrontView: function() {
-
-            isometricLeft = new Vector2(-1.0, 0);
-            isometricRight = new Vector2(1.0, 0);
-            isometricDown = new Vector2(0, -SQRT2_HALF);
-            isometricUp = new Vector2(0, SQRT2_HALF);
-
-            camera.position = new Vector3(-0.000000000000001, cameraAltitude, -cameraAltitude);
-            camera.setTarget(new Vector3(0, 0, 0));
-        },
-        setISOView: function() {
-
-            isometricLeft = new Vector2(-SQRT2/2, -SQRT2_HALF/2);
-            isometricRight = new Vector2(SQRT2/2, SQRT2_HALF/2);
-            isometricDown = new Vector2(SQRT2/2, -SQRT2_HALF/2);
-            isometricUp = new Vector2(-SQRT2/2, SQRT2_HALF/2);
-            
-            camera.position = new Vector3(-cameraAltitude*ISOCOEFF, cameraAltitude, -cameraAltitude*ISOCOEFF);
-            camera.setTarget(new Vector3(0, 0, 0));
-        },
-        panUp: function() {
-            camera.orthoLeft += 1 * isometricUp.x;
-            camera.orthoRight += 1 * isometricUp.x;
-            camera.orthoBottom += 1 * isometricUp.y;
-            camera.orthoTop += 1 * isometricUp.y;
-        },
-        panDown: function() {
-            camera.orthoLeft += 1 * isometricDown.x;
-            camera.orthoRight += 1 * isometricDown.x;
-            camera.orthoBottom += 1 * isometricDown.y;
-            camera.orthoTop += 1 * isometricDown.y;
-        },
-        panLeft: function() {
-            camera.orthoLeft += 1 * isometricLeft.x;
-            camera.orthoRight += 1 * isometricLeft.x;
-            camera.orthoBottom += 1 * isometricLeft.y;
-            camera.orthoTop += 1 * isometricLeft.y;
-        },
-        panRight: function() {
-            camera.orthoLeft += 1 * isometricRight.x;
-            camera.orthoRight += 1 * isometricRight.x;
-            camera.orthoBottom += 1 * isometricRight.y;
-            camera.orthoTop += 1 * isometricRight.y;
-        }
-    };
 
     const camera = new FreeCamera(
         "camera1",
@@ -140,6 +132,54 @@ export default function createScene({ engine, canvas }) {
         scene
     );
     camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
+
+    const topView = new OrthoViewTop({ name: "topview", camera, verticalopeningortho: 32 });
+    const frontView = new OrthoViewFront({ name: "frontview", camera, verticalopeningortho: 32 });
+    const isoView = new OrthoViewISO({ name: "isoview", camera, verticalopeningortho: 32 });
+
+    let currentview = isoView;
+    currentview.activate();
+
+    scene._ = {
+        toggleDebug: function() {
+            scene.debugLayer.isVisible() ? scene.debugLayer.hide() : scene.debugLayer.show();
+        },
+        setTopView: function() {
+            currentview = topView;
+            currentview.activate();
+        },
+        setFrontView: function() {
+            currentview = frontView;
+            currentview.activate();
+        },
+        setISOView: function() {
+            currentview = isoView;
+            currentview.activate();
+        },
+        zoomIn: function() {
+            const currentopening = currentview.getVerticalOpeningOrtho();
+            if(currentopening <= 8) return;
+            currentview.setVerticalOpeningOrtho(
+                currentopening - 4
+            );
+            resize();
+        },
+        zoomOut: function() {
+            currentview.setVerticalOpeningOrtho(
+                currentview.getVerticalOpeningOrtho() + 4
+            );
+            resize();
+        },
+        panUp: function() {
+        },
+        panDown: function() {
+        },
+        panLeft: function() {
+        },
+        panRight: function() {
+        }
+    };
+
     scene._.setISOView();
 
     const hemilight = new PointLight(
@@ -165,7 +205,8 @@ export default function createScene({ engine, canvas }) {
         const viewrect = engine.getRenderingCanvasClientRect();
 
         var ratio = viewrect.width / viewrect.height;
-        var halfOpening = cameraVerticalOpeningOrtho / 2 / SQRT2;
+        var halfOpening = currentview.getVerticalOpeningOrtho() / 2 / SQRT2;
+        console.log("halfOpening", halfOpening);
         var newWidth = halfOpening * ratio;
 
         camera.orthoTop = halfOpening;
@@ -182,12 +223,6 @@ export default function createScene({ engine, canvas }) {
     // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
     const ground = Mesh.CreateGround("ground1", 60, 60, 1, scene);
     ground.receiveShadows = true;
-    /*const groundMaterial = new StandardMaterial("ground", scene);
-    groundMaterial.diffuseColor = new Color3(1, 1, 1);
-    ground.material = groundMaterial;
-    groundMaterial.specularColor = new Color3(0, 0, 0);
-    groundMaterial.emissiveColor = new Color3(1, 0.5, 0.5); // colour of the shadows
-    */
     ground.material = new GridMaterial("groundMaterial", scene);
 
     const cameratarget = Mesh.CreateSphere("cameratarget", 8, 0.2, scene);
@@ -269,8 +304,8 @@ export default function createScene({ engine, canvas }) {
         screenspacepoint.style.top = projected.y + "px";
 
 
-        const camIsoPos = getCameraIsometricPoint();
-        const actorIsoPos = threeDPointToIsometricPoint(actorgroundpos.position);
+        const camIsoPos = currentview.getFocusIsoPoint();
+        const actorIsoPos = currentview.isoPointFrom3DPoint(actorgroundpos.position);
         
          // calculate vector to destination
         let travelIso = actorIsoPos.subtract(camIsoPos);
@@ -288,7 +323,7 @@ export default function createScene({ engine, canvas }) {
         camera.orthoBottom += travelIso.y;
         camera.orthoTop += travelIso.y;
 
-        //console.log("Camera is at " + camIsoPos + "; actor is at " + actorIsoPos);
+        //console.log("Camera is at " + currentview.getFocusIsoPoint() + "; actor is at " + actorIsoPos);
 
         count+= 0.005;
     });
