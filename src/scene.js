@@ -1,27 +1,22 @@
 import { Scene, Camera, SceneLoader, Mesh } from 'babylonjs';
-import { Vector2, Vector3 } from 'babylonjs';
-
-//import { HemisphericLight } from 'babylonjs';
-//import { SpotLight } from 'babylonjs';
-import { PointLight } from 'babylonjs';
-import { DirectionalLight } from 'babylonjs';
-
-//import { ArcRotateCamera } from 'babylonjs';
 import { FreeCamera } from 'babylonjs';
-//import { FollowCamera } from 'babylonjs';
-import { ShadowGenerator } from 'babylonjs';
-//import { UniversalCamera } from 'babylonjs';
-import { Color3, Color4 } from 'babylonjs';
-import { StandardMaterial } from 'babylonjs';
-import { GridMaterial } from 'babylonjs';
+//import { PointLight/*, DirectionalLight*/ } from 'babylonjs';
+
+import { HemisphericLight } from 'babylonjs';
+
+import { GridMaterial, StandardMaterial } from 'babylonjs';
 import { Matrix } from 'babylonjs';
+
+import { Vector2, Vector3 } from 'babylonjs';
+import { Color3, Color4 } from 'babylonjs';
 
 
 const cameraAltitude = 10;
-const shadows = true;
 
 const SQRT2 = Math.sqrt(2);
-const SQRT2_HALF = Math.sqrt(2) / 2;
+const SQRT2_HALF = SQRT2 / 2;
+const SQRT2_FOURTH = SQRT2 / 4;
+const SQRT2_DOUBLE = SQRT2 * 2;
 const ISOCOEFF = Math.sqrt(1.5);
 
 class OrthoViewAbstract {
@@ -60,8 +55,8 @@ class OrthoViewISO extends OrthoViewAbstract {
         const cameray = (camera.orthoTop + camera.orthoBottom) / 2;
 
         // http://clintbellanger.net/articles/isometric_math/
-        const cameraxDivTILE_WIDTH_HALF = camerax / (SQRT2 / 2);
-        const camerayDivTILE_HEIGHT_HALF = cameray / (SQRT2_HALF / 2);
+        const cameraxDivTILE_WIDTH_HALF = camerax / SQRT2_HALF;
+        const camerayDivTILE_HEIGHT_HALF = cameray / SQRT2_FOURTH;
         let mapx = (cameraxDivTILE_WIDTH_HALF + camerayDivTILE_HEIGHT_HALF) / 2;
         let mapy = (camerayDivTILE_HEIGHT_HALF - cameraxDivTILE_WIDTH_HALF) / 2;
 
@@ -73,7 +68,7 @@ class OrthoViewISO extends OrthoViewAbstract {
 
     activate() {
         this.camera.position = new Vector3(-cameraAltitude*ISOCOEFF, cameraAltitude, -cameraAltitude*ISOCOEFF);
-        this.camera.setTarget(new Vector3(0, 0, 0));
+        this.camera.setTarget(Vector3.Zero());
     }
 }
 
@@ -82,13 +77,13 @@ class OrthoViewFront extends OrthoViewAbstract {
     getFocusIsoPoint() {
         const { camera } = this; 
         const camerax = (camera.orthoRight + camera.orthoLeft) / 2;
-        const cameray = (camera.orthoTop + camera.orthoBottom) / 2 / SQRT2_HALF;
+        const cameray = (camera.orthoTop + camera.orthoBottom) / SQRT2;
         return new Vector2(camerax, cameray);
     }
 
     activate() {
         this.camera.position = new Vector3(-0.000000000000001, cameraAltitude, -cameraAltitude);
-        this.camera.setTarget(new Vector3(0, 0, 0));
+        this.camera.setTarget(Vector3.Zero());
     }
 }
 
@@ -103,7 +98,7 @@ class OrthoViewTop extends OrthoViewAbstract {
 
     activate() {
         this.camera.position = new Vector3(0, cameraAltitude, 0);
-        this.camera.setTarget(new Vector3(0, 0, 0));
+        this.camera.setTarget(Vector3.Zero());
     }
 }
 
@@ -128,7 +123,7 @@ export default function createScene({ engine, canvas }) {
 
     const camera = new FreeCamera(
         "camera1",
-        new Vector3(0, 0, 0),
+        Vector3.Zero(),
         scene
     );
     camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
@@ -182,17 +177,17 @@ export default function createScene({ engine, canvas }) {
 
     scene._.setISOView();
 
-    const hemilight = new PointLight(
+    const hemilight = new HemisphericLight(
         "hemilight",
-        new Vector3(5, 10, -5),
+        new Vector3(0, 1, 0),
         scene
     );
-    hemilight.intensity = 1;
-    hemilight.diffuse = new Color3(0.4, 0.4, 0.35);
+    hemilight.intensity = 0.7;
+    hemilight.diffuse = new Color3(1, 1, 1);
     hemilight.specular = new Color3(1, 1, 1);
     hemilight.groundColor = new Color3(0.2, 0.2, 0.2);  // make bottom shadows less harsh
 
-    const light = new DirectionalLight(
+    /*const light = new DirectionalLight(
         "*spot00",
         new Vector3(15, -15, 5).normalize(),
         scene
@@ -200,13 +195,14 @@ export default function createScene({ engine, canvas }) {
     light.intensity = 1;
     light.diffuse = new Color3(1, 1, 0.95);
     light.position = new Vector3(-5, 10, -5);
+    */
 
     const resize = () => {
         const viewrect = engine.getRenderingCanvasClientRect();
 
         var ratio = viewrect.width / viewrect.height;
-        var halfOpening = currentview.getVerticalOpeningOrtho() / 2 / SQRT2;
-        console.log("halfOpening", halfOpening);
+        var halfOpening = currentview.getVerticalOpeningOrtho() / SQRT2_DOUBLE;
+
         var newWidth = halfOpening * ratio;
 
         camera.orthoTop = halfOpening;
@@ -222,10 +218,9 @@ export default function createScene({ engine, canvas }) {
 
     // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
     const ground = Mesh.CreateGround("ground1", 60, 60, 1, scene);
-    ground.receiveShadows = true;
     ground.material = new GridMaterial("groundMaterial", scene);
 
-    const cameratarget = Mesh.CreateSphere("cameratarget", 8, 0.2, scene);
+    const cameratarget = Mesh.CreateBox("cameratarget", 0.2, scene);
     cameratarget.position.y = 0;
     cameratarget.material = new StandardMaterial("cameratarget", scene);
     cameratarget.material.emissiveColor = new Color3(0, 0, 1);
@@ -247,32 +242,37 @@ export default function createScene({ engine, canvas }) {
 
     let actor = null;
 
-    let shadowGenerator;
-    if(shadows) {
-        
-        shadowGenerator = new ShadowGenerator(1024, light);
-        shadowGenerator.useBlurVarianceShadowMap = true;
-        shadowGenerator.blurScale = 1;
-
-        light.includedOnlyMeshes.push(ground);
-    }
-
     // The first parameter can be used to specify which mesh to import. Here we import all meshes
-    SceneLoader.ImportMesh("", "res/models/web/", "ship-helico-game.babylon", scene, function (newMeshes) {
-        // Set the target of the camera to the first imported mesh
+    //SceneLoader.ImportMesh("", "res/models/web/", "ship-helico-game.babylon", scene, function (newMeshes) {
+    //const model = "alien2.babylon";
+    const model = "ship.babylon";
 
-        actor = newMeshes[0];
-        actor.position.y = 0;
+    SceneLoader.ImportMesh("", "res/models/web/aliens/", model, scene, function (meshes, particleSystems, skeletons) {
 
-        if(shadows) {
-            light.includedOnlyMeshes.push(actor);
-            shadowGenerator.getShadowMap().renderList.push(actor);
+        actor = meshes[0];
+        actor.position.y = 1;
+        //actor.rotation.x = -Math.PI/2;
+        actor.rotation.y = Math.PI;
+        actor.scaling = new Vector3(0.2, 0.2, 0.2);
 
-            actor.getChildren().map(submesh => {
-                shadowGenerator.getShadowMap().renderList.push(submesh);
-                light.includedOnlyMeshes.push(submesh);
-            });
-        }
+        /*
+        const shadeless = new StandardMaterial("shadeless", scene);
+        shadeless.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        shadeless.specularColor = new BABYLON.Color3(0, 0, 0);
+        shadeless.emissiveTexture = shadeless.diffuseTexture;
+        shadeless.diffuseTexture = null;
+        */
+
+        actor.getChildMeshes().map(mesh => {
+            //mesh.material.diffuseColor = new Color4(0, 0, 0, 0);
+            mesh.material.specularColor = new Color3(0, 0, 0);
+            mesh.material.emissiveTexture = mesh.material.diffuseTexture;
+            mesh.material.emissiveColor = new Color4(0, 0, 0, 0);
+            //mesh.material.diffuseTexture = null;
+            mesh.material.freeze();
+        });
+
+        actor.material.freeze();
     });
 
     let count = 0;
@@ -291,12 +291,12 @@ export default function createScene({ engine, canvas }) {
         const tangentvec = new Vector2(pos.y, -pos.x);
         const rotation = Math.atan2(tangentvec.y, tangentvec.x);
 
-        actor.rotation.y = -rotation + Math.PI*0.5;
+        actor.rotation.y = -rotation - Math.PI/2;
+        //actor.rotation.x = -Math.PI/2;
 
         actorgroundpos.position.x = actor.position.x;
         actorgroundpos.position.z = actor.position.z;
         actorgroundpos.position.y = 0;
-        actorgroundpos.rotation = actor.rotation; 
 
         const projected = project3DToScreenSpace(actorgroundpos.position);
         const screenspacepoint = document.getElementById("screenspacepoint");
@@ -308,20 +308,17 @@ export default function createScene({ engine, canvas }) {
         const actorIsoPos = currentview.isoPointFrom3DPoint(actorgroundpos.position);
         
          // calculate vector to destination
-        let travelIso = actorIsoPos.subtract(camIsoPos);
+        const travelIso = actorIsoPos.subtract(camIsoPos);
 
-        const maxdist = 0.1;
-        const maxdistsq = maxdist * maxdist;
+        // Dampening the movement for smoother curves
+        // This causes the camera focus to "lag" some pixels behind the actual target (when it's moving), but it's undetectable, ang produces a nicer effect overall
+        const dampeningfac = 0.1;
 
-        if(travelIso.lengthSquared() > maxdistsq) {
-            travelIso = travelIso.normalize().multiplyInPlace(new Vector3(maxdist, maxdist, maxdist));
-        }
+        camera.orthoLeft += travelIso.x*dampeningfac;
+        camera.orthoRight += travelIso.x*dampeningfac;
 
-        camera.orthoLeft += travelIso.x;
-        camera.orthoRight += travelIso.x;
-
-        camera.orthoBottom += travelIso.y;
-        camera.orthoTop += travelIso.y;
+        camera.orthoBottom += travelIso.y*dampeningfac;
+        camera.orthoTop += travelIso.y*dampeningfac;
 
         //console.log("Camera is at " + currentview.getFocusIsoPoint() + "; actor is at " + actorIsoPos);
 
