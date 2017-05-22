@@ -8,8 +8,8 @@
     "lint": "eslint src/",
     "build:js": "rollup -c rollup.config.js",
     "build": "npm run --silent lint && npm run --silent build:js",
-    "_watch:dev": "chokidar 'src/**/*.js' -c 'npm run --silent build'",
-    "_watch:dev:nolint": "chokidar 'src/**/*.js' -c 'npm run --silent build:js'",
+    "_watch:dev": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build'",
+    "_watch:dev:nolint": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build:js'",
     "_livereload": "live-server --watch=./lib",
     "dev": "parallelshell 'npm run _watch:dev' 'npm run _livereload'",
     "dev:nolint": "parallelshell 'npm run _watch:dev:nolint' 'npm run _livereload'",
@@ -19,6 +19,7 @@
   "license": "MIT",
   "homepage": "https://bytearena.com",
   "devDependencies": {
+    "@alexlur/rollup-plugin-typescript": "^1.0.4",
     "babel-cli": "^6.24.1",
     "babel-eslint": "^7.2.3",
     "babel-preset-babili": "0.0.12",
@@ -31,6 +32,7 @@
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-babili": "^3.0.0",
-    "rollup-watch": "^3.2.2"
+    "rollup-watch": "^3.2.2",
+    "typescript": "^2.3.2"
   }
 }
