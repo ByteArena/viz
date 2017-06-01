@@ -3,8 +3,9 @@
 import { Engine } from 'babylonjs';
 
 import createScene from './scene';
+import comm from './comm';
 
-export default async function main(canvas: HTMLCanvasElement) : Promise<any> {
+export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number) : Promise<any> {
 
     const engine = new Engine(canvas, true);    // true: webgl AA
     engine.enableOfflineSupport = false; // disable mesh in-browser cache (and the 404 error for manifest files)
@@ -48,5 +49,12 @@ export default async function main(canvas: HTMLCanvasElement) : Promise<any> {
     document.getElementById("zoomout").addEventListener("click", e => {
         e.stopPropagation();
         handles.zoomOut();
+    });
+
+    comm(wsurl, tps, function onMessage(message: Vizmessage) {
+        //console.log("MESSAGE !", message);
+        message.Agents.forEach((agent) => {
+            handles.setAgent(agent);
+        });
     });
 }

@@ -11,7 +11,7 @@ export default class Agent implements SceneComponent {
 
     private state: {
         count: number,
-        orbitradius: number,
+        //orbitradius: number,
     };
 
     static shipmesh: Mesh = null;
@@ -22,11 +22,11 @@ export default class Agent implements SceneComponent {
         Agent.shadowmesh = shadowmesh;
     }
 
-    init(scene: Scene, { orbitradius } : { orbitradius: number } = { orbitradius: 4.0 }) : Promise<this> {
+    init(scene: Scene/*, { orbitradius } : { orbitradius: number } = { orbitradius: 4.0 }*/) : Promise<this> {
 
         this.state = {
             count: 0.0,
-            orbitradius: orbitradius,
+            //orbitradius: orbitradius,
         };
 
         const randid = Math.random();
@@ -44,6 +44,7 @@ export default class Agent implements SceneComponent {
     destroy(scene: Scene) { }
     update(scene: Scene) {
 
+        /*
         const { agentinstance, shadowinstance } = this;
         if(agentinstance === null || shadowinstance === null) return;
 
@@ -65,6 +66,22 @@ export default class Agent implements SceneComponent {
         shadowinstance.position = actorgroundpos;
 
         this.state.count+= 0.005;
+        */
+    }
+
+    setPosition(x: number, y: number) {
+        const { agentinstance, shadowinstance } = this;
+        if(agentinstance === null || shadowinstance === null) return;
+
+        agentinstance.position.x = x;
+        agentinstance.position.z = y;
+
+        shadowinstance.position = new Vector3(agentinstance.position.x, 0, agentinstance.position.z);
+    }
+
+    setOrientation(orientation: number) {
+        const { agentinstance } = this;
+        agentinstance.rotation.y = orientation;
     }
 
     getPosition() : Vector3 {

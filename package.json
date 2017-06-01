@@ -10,8 +10,8 @@
     "build": "npm run --silent lint && npm run --silent build:js",
     "_watch:dev": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build'",
     "_watch:dev:nolint": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build:js'",
-    "_livereload": "live-server --watch=./lib",
-    "dev": "parallelshell 'npm run _watch:dev' 'npm run _livereload'",
+    "_livereload": "live-server --no-browser --cors --watch=./lib",
+    "dev": "npm run build && parallelshell 'npm run _watch:dev' 'npm run _livereload'",
     "dev:nolint": "parallelshell 'npm run _watch:dev:nolint' 'npm run _livereload'",
     "clean": "rm -Rf lib/*",
     "prepublish": "npm run build"
@@ -32,7 +32,13 @@
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-babili": "^3.0.0",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-watch": "^3.2.2",
     "typescript": "^2.3.2"
+  },
+  "dependencies": {
+    "bytearena-sdk": "0.0.1",
+    "denque": "^1.1.1"
   }
 }

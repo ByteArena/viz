@@ -85,9 +85,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     const assetsManager = new AssetsManager(scene);
     assetsManager.useDefaultLoadingScreen = false;
 
-    assetsManager.addMeshTask("mesh:ship", "Ship", "res/models/web/aliens/", "ship.babylon");
-    assetsManager.addMeshTask("mesh:wall", "", "res/models/web/", "wall.babylon");
-    assetsManager.addImageTask("image:shadow", "res/img/textures/shadow.png");
+    assetsManager.addMeshTask("mesh:ship", "Ship", "http://localhost:8080/res/models/web/aliens/", "ship.babylon");
+    assetsManager.addMeshTask("mesh:wall", "", "http://localhost:8080/res/models/web/", "wall.babylon");
+    assetsManager.addImageTask("image:shadow", "http://localhost:8080/res/img/textures/shadow.png");
 
     const assets = await loadAssets(assetsManager);
 
@@ -139,13 +139,16 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     // AGENT
     const shadowmesh = Mesh.CreatePlane("actorshadow", 1.0, scene);
     shadowmesh.setEnabled(false);
+    
 
     const shadowMaterial = new StandardMaterial("shadow", scene);
     shadowMaterial.emissiveTexture = new Texture("data:res/img/textures/shadow.png", scene, true, true, Texture.TRILINEAR_SAMPLINGMODE, () => null, () => null, assets.images.get("shadow"));
     shadowMaterial.opacityTexture = shadowMaterial.emissiveTexture;
+    shadowMaterial.alphaMode = Engine.ALPHA_MULTIPLY;
     shadowmesh.material = shadowMaterial;
-    shadowmesh.rotation.x = constants.PI_HALF;
     shadowmesh.material.freeze();
+
+    shadowmesh.rotation.x = constants.PI_HALF;
 
     const shipmesh = assets.meshes.get("ship");
 
@@ -162,12 +165,16 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
         shadowmesh
     );
 
+    const agents = new Map<string, AgentComponent>();
+
+    /*
     const agents = new Array<AgentComponent>();
     for(let k = 1; k < 6; k++) {
         const agent = new AgentComponent();
         agent.init(scene, { orbitradius: k * 2 });
         agents.push(agent);
     }
+    */
 
     // WALLS
 
@@ -211,15 +218,15 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     
     scene.registerBeforeRender(() => {
 
-        agents.map(agent => {
-            agent.update(scene);
-        });
+        // agents.map(agent => {
+        //     agent.update(scene);
+        // });
 
         cursor3D.update(scene, { projection, point: scenestate.pickpos });
 
         /* Moving camera focus */
-        if(agents.length > 0) {
-            const agentpos = agents[0].getPosition();
+        if(agents.size > 0) {
+            const agentpos = Array.from(agents)[0][1].getPosition();
             projection.follow(new Vector3(agentpos.x, 0, agentpos.z));  // 0 on y: aligning on ground
         }
     });
@@ -265,6 +272,22 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
             click: function() {
                 const pickResult = scene.pick(scene.pointerX, scene.pointerY);
                 scenestate.pickpos = pickResult.pickedPoint;    // pos or null
+            },
+            setAgent: function(agentinfo: Vizagentmessage) {
+
+                let agent = null;
+                if(!agents.has(agentinfo.Id)) {
+                    agent = new AgentComponent();
+                    agent.init(scene);
+                    agents.set(agentinfo.Id, agent);
+                    //console.log("iciiiii");
+                } else {
+                    //console.log("laaaaaaaaaaaa", agentinfo.Id);
+                    agent = agents.get(agentinfo.Id);
+                }
+
+                agent.setPosition(agentinfo.Position[0]/25, agentinfo.Position[1]/25);
+                agent.setOrientation(agentinfo.Orientation);
             }
         }
     };
