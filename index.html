@@ -59,12 +59,13 @@
     crossorigin="anonymous"></script>
 <script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/35cb3a9b/dist/preview%20release/babylon.js"></script>
 <script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.gridMaterial.min.js"></script>
-<script src="/lib/bytearenaviz.min.js"></script>
+<script src="/lib/bytearenaviz.min.js?{{.Rand}}"></script>
 <script>
     (function () {
         window.ByteArena.startViz(
             document.getElementById('renderCanvas'),
-            "{{.WsURL}}"
+            "{{.WsURL}}",
+            "{{.Tps}}"
         );
     })();
 

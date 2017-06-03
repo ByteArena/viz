@@ -35,10 +35,17 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
 
     const agentDiffs = nextframeAgentsProps.map((nextprops, index) => {
         const thisprops = thisframeAgentsProps[index];
+
+        let difforientation = nextprops.orientation - thisprops.orientation;
+
+        if(difforientation > Math.PI) {
+            difforientation = difforientation - 2 * Math.PI;
+        }
+
         return {
             velocity: nextprops.velocity.clone().sub(thisprops.velocity),
             position: nextprops.position.clone().sub(thisprops.position),
-            orientation: nextprops.orientation - thisprops.orientation,
+            orientation: difforientation,
         };
     });
 
@@ -56,7 +63,7 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
             ).toArray();
 
             interpolatedframe.Agents[agentindex].Orientation = thisframeAgentsProps[agentindex].orientation + (agentdiff.orientation * timeratio);
-            console.log(agentdiff.orientation);
+            //console.log(agentdiff.orientation);
         });
 
         sendFrame(interpolatedframe);

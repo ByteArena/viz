@@ -5,7 +5,6 @@ import * as constants from '../constants';
 
 export default class Agent implements SceneComponent {
 
-    private agent: Mesh = null;
     private agentinstance: InstancedMesh = null;
     private shadowinstance: InstancedMesh = null;
 
@@ -42,32 +41,7 @@ export default class Agent implements SceneComponent {
     }
 
     destroy(scene: Scene) { }
-    update(scene: Scene) {
-
-        /*
-        const { agentinstance, shadowinstance } = this;
-        if(agentinstance === null || shadowinstance === null) return;
-
-        const { orbitradius } = this.state;
-
-        let ox = 0; let oz = 0; // orbit center
-
-        agentinstance.position.x = ox + orbitradius * Math.sin(this.state.count);
-        agentinstance.position.z = oz - orbitradius * Math.cos(this.state.count);
-
-        const pos = new Vector2(agentinstance.position.x, agentinstance.position.z);
-        const tangentvec = new Vector2(pos.y, -pos.x);
-        const rotation = Math.atan2(tangentvec.y, tangentvec.x);
-
-        agentinstance.rotation.y = -rotation - constants.PI_HALF;
-
-        const actorgroundpos = new Vector3(agentinstance.position.x, 0, agentinstance.position.z);
-
-        shadowinstance.position = actorgroundpos;
-
-        this.state.count+= 0.005;
-        */
-    }
+    update(scene: Scene) { }
 
     setPosition(x: number, y: number) {
         const { agentinstance, shadowinstance } = this;

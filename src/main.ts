@@ -9,7 +9,7 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
 
     const engine = new Engine(canvas, true);    // true: webgl AA
     engine.enableOfflineSupport = false; // disable mesh in-browser cache (and the 404 error for manifest files)
-    console.log(engine.getRenderingCanvasClientRect());
+    //console.log(engine.getRenderingCanvasClientRect());
 
     const { scene, handles } = await createScene(engine, canvas);
 
@@ -51,10 +51,5 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
         handles.zoomOut();
     });
 
-    comm(wsurl, tps, function onMessage(message: Vizmessage) {
-        //console.log("MESSAGE !", message);
-        message.Agents.forEach((agent) => {
-            handles.setAgent(agent);
-        });
-    });
+    comm(wsurl, tps, handles.setVizMessage);
 }

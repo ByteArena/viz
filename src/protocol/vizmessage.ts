@@ -28,6 +28,7 @@ type Vizprojectilemessage = {
 }
 
 type Vizobstaclemessage = {
+	Id: string,
 	A: Vec2Array,
 	B: Vec2Array,
 }

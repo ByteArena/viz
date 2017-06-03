@@ -15,7 +15,10 @@ import * as constants from './constants';
 import Projection from './projection';
 import GridMaterial from './gridmaterial';
 import AgentComponent from './components/agent';
+import WallComponent from './components/wall';
 import IsoCursorComponent from './components/isocursor';
+
+import './protocol/vizmessage'
 
 const scenestate = {
     pickpos: null,
@@ -85,9 +88,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     const assetsManager = new AssetsManager(scene);
     assetsManager.useDefaultLoadingScreen = false;
 
-    assetsManager.addMeshTask("mesh:ship", "Ship", "http://localhost:8080/res/models/web/aliens/", "ship.babylon");
-    assetsManager.addMeshTask("mesh:wall", "", "http://localhost:8080/res/models/web/", "wall.babylon");
-    assetsManager.addImageTask("image:shadow", "http://localhost:8080/res/img/textures/shadow.png");
+    assetsManager.addMeshTask("mesh:ship", "Ship", "/res/models/web/aliens/", "ship.babylon");
+    assetsManager.addMeshTask("mesh:wall", "", "/res/models/web/", "wall.babylon");
+    assetsManager.addImageTask("image:shadow", "/res/img/textures/shadow.png");
 
     const assets = await loadAssets(assetsManager);
 
@@ -150,6 +153,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
 
     shadowmesh.rotation.x = constants.PI_HALF;
 
+
+    /* Agent ship mesh + material */
+
     const shipmesh = assets.meshes.get("ship");
 
     shipmesh.convertToFlatShadedMesh();
@@ -165,62 +171,36 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
         shadowmesh
     );
 
+    /* Wall mesh + material */
+    const wallmesh = assets.meshes.get("wall");
+    wallmesh.convertToFlatShadedMesh();
+    const wallmaterial = wallmesh.material as StandardMaterial;
+    wallmaterial.unfreeze();
+    wallmaterial.diffuseColor = new Color3(0, 0, 0);
+    wallmaterial.diffuseTexture = null;
+    wallmaterial.specularColor = new Color3(0, 0, 0);
+    wallmaterial.emissiveColor = new Color3(255, 255, 255);
+    /*wallmaterial.subMaterials.map(material => {
+        material.emissiveColor = material.diffuseColor;
+    });*/
+    wallmesh.material.freeze();
+
+    WallComponent.setup(wallmesh);
+
     const agents = new Map<string, AgentComponent>();
+    const walls = new Map<string, WallComponent>();
 
-    /*
-    const agents = new Array<AgentComponent>();
-    for(let k = 1; k < 6; k++) {
-        const agent = new AgentComponent();
-        agent.init(scene, { orbitradius: k * 2 });
-        agents.push(agent);
-    }
-    */
+    // const wall = new WallComponent();
+    // wall.init(scene);
+    // walls.set("randomid", wall);
 
-    // WALLS
-
-    /*
-    let wall = null;
-
-    SceneLoader.ImportMesh("", "res/models/web/", "wall.babylon", scene, function (meshes, particleSystems, skeletons) {
-
-        wall = meshes[0];
-        wall.convertToFlatShadedMesh();
-        wall.position.y = 0;
-        wall.position.z = 0;
-
-        wall.material.diffuseColor = new Color3(0, 0, 0);
-        wall.material.diffuseTexture = null;
-        wall.material.specularColor = new Color3(0, 0, 0);
-        wall.material.emissiveColor = new Color4(0, 0, 0, 0);
-        wall.material.subMaterials.map(material => {
-            material.emissiveColor = material.diffuseColor;
-        });
-
-        wall.material.freeze();
-
-        let pos = Vector3.Zero();
-        for(let k = 0; k < 100; k++) {
-            const wallx = wall.createInstance("wall" + k);
-            const dir = Math.random() > 0.5 ? 'x' : 'z';
-            if(dir === 'x') {
-                wallx.rotation.y = -constants.PI_HALF;
-            }
-            pos[dir]++;
-            wallx.position = pos.clone();
-        }
-
-    });
-    */
+    // wall.setPosition(0, 0, 2, 1);
 
     /* ********************************************************************* */
     /* MECANICS */
     /* ********************************************************************* */
     
     scene.registerBeforeRender(() => {
-
-        // agents.map(agent => {
-        //     agent.update(scene);
-        // });
 
         cursor3D.update(scene, { projection, point: scenestate.pickpos });
 
@@ -273,21 +253,39 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                 const pickResult = scene.pick(scene.pointerX, scene.pointerY);
                 scenestate.pickpos = pickResult.pickedPoint;    // pos or null
             },
-            setAgent: function(agentinfo: Vizagentmessage) {
+            setVizMessage: function(vizmsg: Vizmessage) {
 
-                let agent = null;
-                if(!agents.has(agentinfo.Id)) {
-                    agent = new AgentComponent();
-                    agent.init(scene);
-                    agents.set(agentinfo.Id, agent);
-                    //console.log("iciiiii");
-                } else {
-                    //console.log("laaaaaaaaaaaa", agentinfo.Id);
-                    agent = agents.get(agentinfo.Id);
-                }
+                const unitRatio = 1 / 25;
 
-                agent.setPosition(agentinfo.Position[0]/25, agentinfo.Position[1]/25);
-                agent.setOrientation(agentinfo.Orientation);
+                vizmsg.Agents.forEach(agentinfo => {
+                    let agent = null;
+                    if (!agents.has(agentinfo.Id)) {
+                        agent = new AgentComponent();
+                        agent.init(scene);
+                        agents.set(agentinfo.Id, agent);
+                    } else {
+                        agent = agents.get(agentinfo.Id);
+                    }
+
+                    agent.setPosition(agentinfo.Position[0] * unitRatio, agentinfo.Position[1] * unitRatio);
+                    agent.setOrientation(agentinfo.Orientation);
+                });
+
+                vizmsg.Obstacles.forEach(obstacleinfo => {
+
+                    let wall = null;
+                    if (!walls.has(obstacleinfo.Id)) {
+                        wall = new WallComponent();
+                        wall.init(scene);
+                        walls.set(obstacleinfo.Id, wall);
+
+                        const startpos = obstacleinfo.A;
+                        const endpos = obstacleinfo.B;
+                        console.log(obstacleinfo, startpos);
+
+                        wall.setPosition(startpos[0] * unitRatio, startpos[1] * unitRatio, endpos[0] * unitRatio, endpos[1] * unitRatio);
+                    }
+                });
             }
         }
     };
