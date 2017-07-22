@@ -16,7 +16,7 @@ export default class IsoCursor implements SceneComponent {
     destroy(scene: Scene) { }
     update(scene: Scene, { projection, point } : { projection: Projection, point: Vector3 }) {
 
-        if(point === null) return;
+        if(point === null) point = new Vector3(0, 0, 0);
 
         const projected = projection.project3DToScreenSpace(point);
         const screenspacepoint = document.getElementById("screenspacepoint");

@@ -15,9 +15,9 @@ export default class Projection {
 
         this.views = new Map<string, OrthoViewAbstract>();
 
-        this.views.set("top", new OrthoViewTop("top", camera, 32));
-        this.views.set("front", new OrthoViewFront("front", camera, 32));
-        this.views.set("iso", new OrthoViewIsometric("iso", camera, 32));
+        this.views.set("top", new OrthoViewTop("top", camera, 150));
+        this.views.set("front", new OrthoViewFront("front", camera, 150));
+        this.views.set("iso", new OrthoViewIsometric("iso", camera, 150));
 
         this.useView(view);
     }

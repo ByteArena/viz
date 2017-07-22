@@ -51,5 +51,5 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
         handles.zoomOut();
     });
 
-    comm(wsurl, tps, handles.setVizMessage);
+    comm(wsurl, tps, handles.setMap, handles.setVizMessage);
 }

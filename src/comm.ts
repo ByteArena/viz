@@ -4,7 +4,7 @@ import './protocol/vizmessage';
 import './protocol/deque';
 import { Bucket, Frame } from './bucket';
 
-export default function comm (websocketurl: string, tps: number, onMessage: (message: Object) => void) {
+export default function comm (websocketurl: string, tps: number, setMap: (map: any) => void, onMessage: (message: Object) => void) {
 
     let ws = null;
     const bucket = new Bucket();
@@ -27,14 +27,24 @@ export default function comm (websocketurl: string, tps: number, onMessage: (mes
             console.log("Connected to", websocketurl);
 
             ws.onmessage = evt => {
-                let frames;
+
+                let msg;
                 try {
-                    frames = JSON.parse(evt.data);
+                    msg = JSON.parse(evt.data);
                 } catch(e) {
                     console.log("ERROR", e, evt.data);
                 }
 
-                bucket.addFrames(frames.map(Frame.fromVizmessage));
+                switch(msg.type) {
+                    case "init": {
+                        setMap(msg.data.map);
+                        break;
+                    }
+                    case "framebatch": {
+                        bucket.addFrames(msg.data.map(Frame.fromVizmessage));
+                        break;
+                    }
+                }
             }
 
             ws.onclose = function(evt) {

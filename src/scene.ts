@@ -1,5 +1,6 @@
 import { Engine, Scene, Camera, SceneLoader, Mesh } from 'babylonjs';
 import { AssetsManager, IAssetTask, MeshAssetTask, ImageAssetTask, TextureAssetTask } from 'babylonjs';
+import { VertexData, VertexBuffer } from 'babylonjs';
 
 import { FreeCamera } from 'babylonjs';
 
@@ -253,9 +254,68 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                 const pickResult = scene.pick(scene.pointerX, scene.pointerY);
                 scenestate.pickpos = pickResult.pickedPoint;    // pos or null
             },
+            setMap: function(arenamap: any) {
+
+                arenamap.data.grounds.map((ground, index) => {
+
+                    var groundmesh = new Mesh("ground" + index, scene);
+                    groundmesh.position = Vector3.Zero();
+                    //groundmesh.scaling = new Vector3(1, 1, -1);
+                    var groundMaterial = new StandardMaterial("groundmaterial", scene);
+                    groundMaterial.backFaceCulling = false;
+                    groundMaterial.disableLighting = true;
+                    groundmesh.material = groundMaterial;
+
+                    var positions = ground.mesh.map(triangle => {
+                        return [
+                            [triangle[0][0], 0, triangle[0][1]],
+                            [triangle[1][0], 0, triangle[1][1]],
+                            [triangle[2][0], 0, triangle[2][1]],
+                        ]
+                    });
+
+                    // connect the triangle dots ... counter clockwise
+                    var indices = [];
+                    
+                    for(var i = 0; i < positions.length; i++) {
+                        var offset = i*3;
+                        indices.push(offset+0, offset+1, offset+2); // connect vertices 0->1->2
+                    }
+                    
+                    // Make a mesh shaper device.
+                    var vertexData = new VertexData();
+
+                    // stuff its buffers with your stuff
+
+                    function flatten(arr) {
+                        return arr.reduce(function (flat, toFlatten) {
+                            return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+                        }, []);
+                    }
+
+                    vertexData.positions = flatten(positions);
+                    vertexData.indices = indices;
+                    
+                    // Use the vertexData object.. to shape-ify blankmesh
+                    vertexData.applyToMesh(groundmesh);
+                });
+            },
             setVizMessage: function(vizmsg: Vizmessage) {
 
-                const unitRatio = 1 / 25;
+                const unitRatio = 1 / 50;
+
+                const debugpoints = document.getElementById("debugpoints");
+                while(debugpoints.firstChild) {
+                    debugpoints.removeChild(debugpoints.firstChild);
+                }
+
+                vizmsg.DebugPoints.concat(vizmsg.DebugIntersects).forEach((debugpoint, index) => {
+                    const projected = projection.project3DToScreenSpace(new Vector3(debugpoint[0] * unitRatio, 0, debugpoint[1] * unitRatio));
+                    const newDebugPoint: HTMLDivElement = document.createElement("div");
+                    newDebugPoint.style.left = projected.x + "px";
+                    newDebugPoint.style.top = projected.y + "px";
+                    debugpoints.appendChild(newDebugPoint);
+                });
 
                 vizmsg.Agents.forEach(agentinfo => {
                     let agent = null;
@@ -271,21 +331,29 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                     agent.setOrientation(agentinfo.Orientation);
                 });
 
-                vizmsg.Obstacles.forEach(obstacleinfo => {
+                var wall = new WallComponent();
+                wall.init(scene);
+                walls.set("wall", wall);
 
-                    let wall = null;
-                    if (!walls.has(obstacleinfo.Id)) {
-                        wall = new WallComponent();
-                        wall.init(scene);
-                        walls.set(obstacleinfo.Id, wall);
+                const startpos = [0, 0];
+                const endpos = [10, 10];
+                wall.setPosition(startpos[0] * unitRatio, startpos[1] * unitRatio, endpos[0] * unitRatio, endpos[1] * unitRatio);
 
-                        const startpos = obstacleinfo.A;
-                        const endpos = obstacleinfo.B;
-                        console.log(obstacleinfo, startpos);
+                // vizmsg.Obstacles.forEach(obstacleinfo => {
 
-                        wall.setPosition(startpos[0] * unitRatio, startpos[1] * unitRatio, endpos[0] * unitRatio, endpos[1] * unitRatio);
-                    }
-                });
+                //     let wall = null;
+                //     if (!walls.has(obstacleinfo.Id)) {
+                //         wall = new WallComponent();
+                //         wall.init(scene);
+                //         walls.set(obstacleinfo.Id, wall);
+
+                //         const startpos = obstacleinfo.A;
+                //         const endpos = obstacleinfo.B;
+                //         console.log(obstacleinfo, startpos);
+
+                //         wall.setPosition(startpos[0] * unitRatio, startpos[1] * unitRatio, endpos[0] * unitRatio, endpos[1] * unitRatio);
+                //     }
+                // });
             }
         }
     };

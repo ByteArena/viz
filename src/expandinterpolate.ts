@@ -42,6 +42,10 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
             difforientation = difforientation - 2 * Math.PI;
         }
 
+        if(difforientation < -Math.PI) {
+            difforientation = difforientation + 2 * Math.PI;
+        }
+
         return {
             velocity: nextprops.velocity.clone().sub(thisprops.velocity),
             position: nextprops.position.clone().sub(thisprops.position),

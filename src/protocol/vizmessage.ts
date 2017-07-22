@@ -4,7 +4,7 @@ type Vizmessage = {
 	Obstacles:               Vizobstaclemessage[],
 	DebugIntersects:         Vec2Array,
 	DebugIntersectsRejected: Vec2Array,
-	DebugPoints:             Vec2Array,
+	DebugPoints:             Vec2Array[],
 }
 
 type Vec2Array = [number, number];

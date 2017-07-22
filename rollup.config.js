@@ -19,7 +19,7 @@ export default {
         babili({
             "comments": false,
             "banner": "/* ByteArena Viz v" + pkge.version + "; License " + pkge.license + "; " + pkge.homepage + " */",
-            "sourcemap": false
+            //"sourcemap": false
         }),
         typescript(),
 
