@@ -5,6 +5,7 @@ export default abstract class OrthoViewAbstract {
     protected name: string;
     protected camera: FreeCamera;
     protected verticalopeningortho: number;
+    protected zoompercent: number;
 
     constructor(name: string, camera: FreeCamera, verticalopeningortho: number = 32) {
         this.name = name;
@@ -22,6 +23,11 @@ export default abstract class OrthoViewAbstract {
 
     setVerticalOpeningOrtho(verticalopeningortho) : this {
         this.verticalopeningortho = verticalopeningortho;
+        return this;
+    }
+
+    setZoom(zoompercent: number) : this {
+        this.zoompercent = zoompercent;
         return this;
     }
 

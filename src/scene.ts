@@ -14,12 +14,16 @@ import { Color3, Color4 } from 'babylonjs';
 
 import * as constants from './constants';
 import Projection from './projection';
-import GridMaterial from './gridmaterial';
+//import GridMaterial from './gridmaterial';
 import AgentComponent from './components/agent';
-import WallComponent from './components/wall';
+import RocksTallOreComponent from './components/rocksTallOre';
 import IsoCursorComponent from './components/isocursor';
 
 import './protocol/vizmessage'
+
+const valueMapRange = function(n: number, start1: number, stop1: number, start2: number, stop2: number) : number {
+	return ((n-start1)/(stop1-start1))*(stop2-start2) + start2
+};
 
 const scenestate = {
     pickpos: null,
@@ -90,8 +94,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     assetsManager.useDefaultLoadingScreen = false;
 
     assetsManager.addMeshTask("mesh:ship", "Ship", "/res/models/web/aliens/", "ship.babylon");
-    assetsManager.addMeshTask("mesh:wall", "", "/res/models/web/", "wall.babylon");
+    assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", "/res/models/web/kenney-space-kit/", "rocksTallOre.babylon");
     assetsManager.addImageTask("image:shadow", "/res/img/textures/shadow.png");
+    assetsManager.addImageTask("image:desert", "/res/img/textures/desert2.jpg");
 
     const assets = await loadAssets(assetsManager);
 
@@ -132,9 +137,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     /* ********************************************************************* */
 
     // GROUND
-    const ground = Mesh.CreateGround("ground1", 1000, 1000, 1, scene);
-    ground.material = new GridMaterial("groundMaterial", scene);
-    ground.position.y = -0.001; // slightly below the y origin to avoid rendering artefacts due to coplanar meshes on y=0
+    //const ground = Mesh.CreateGround("ground1", 1000, 1000, 1, scene);
+    //ground.material = new GridMaterial("groundMaterial", scene);
+    //ground.position.y = -0.001; // slightly below the y origin to avoid rendering artefacts due to coplanar meshes on y=0
 
     // 3D CURSOR
     const cursor3D = new IsoCursorComponent();
@@ -160,42 +165,35 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     const shipmesh = assets.meshes.get("ship");
 
     shipmesh.convertToFlatShadedMesh();
-    const material = shipmesh.material as StandardMaterial;
-    material.unfreeze();
-    material.specularColor = new Color3(0, 0, 0);
-    material.emissiveTexture = material.diffuseTexture;
-    material.emissiveColor = new Color3(0, 0, 0);
-    material.freeze();
+    const agentmaterial = shipmesh.material as StandardMaterial;
+    agentmaterial.unfreeze();
+    agentmaterial.specularColor = new Color3(0, 0, 0);
+    agentmaterial.emissiveTexture = agentmaterial.diffuseTexture;
+    agentmaterial.emissiveColor = new Color3(0, 0, 0);
+    agentmaterial.freeze();
 
     AgentComponent.setup(
         shipmesh,
         shadowmesh
     );
 
-    /* Wall mesh + material */
-    const wallmesh = assets.meshes.get("wall");
-    wallmesh.convertToFlatShadedMesh();
-    const wallmaterial = wallmesh.material as StandardMaterial;
-    wallmaterial.unfreeze();
-    wallmaterial.diffuseColor = new Color3(0, 0, 0);
-    wallmaterial.diffuseTexture = null;
-    wallmaterial.specularColor = new Color3(0, 0, 0);
-    wallmaterial.emissiveColor = new Color3(255, 255, 255);
-    /*wallmaterial.subMaterials.map(material => {
-        material.emissiveColor = material.diffuseColor;
-    });*/
-    wallmesh.material.freeze();
-
-    WallComponent.setup(wallmesh);
-
     const agents = new Map<string, AgentComponent>();
-    const walls = new Map<string, WallComponent>();
 
-    // const wall = new WallComponent();
-    // wall.init(scene);
-    // walls.set("randomid", wall);
+    /* Obstacles meshs + materials */
 
-    // wall.setPosition(0, 0, 2, 1);
+    const rocksTallOreMesh = assets.meshes.get("rocksTallOre");
+    
+    rocksTallOreMesh.convertToFlatShadedMesh();
+    const rocksTallOreMaterial = shipmesh.material as StandardMaterial;
+    rocksTallOreMaterial.unfreeze();
+    rocksTallOreMaterial.specularColor = new Color3(0, 0, 0);
+    rocksTallOreMaterial.emissiveTexture = rocksTallOreMaterial.diffuseTexture;
+    rocksTallOreMaterial.emissiveColor = new Color3(0, 0, 0);
+    rocksTallOreMaterial.freeze();
+
+    RocksTallOreComponent.setup(
+        rocksTallOreMesh
+    );
 
     /* ********************************************************************* */
     /* MECANICS */
@@ -210,13 +208,16 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
             const agentpos = Array.from(agents)[0][1].getPosition();
             projection.follow(new Vector3(agentpos.x, 0, agentpos.z));  // 0 on y: aligning on ground
         }
+
+        //projection.follow(new Vector3(100, 0, 100));  // 0 on y: aligning on ground
     });
 
     return {
         scene,
         handles: {
             toggleDebug: function() {
-                scene.debugLayer.isVisible() ? scene.debugLayer.hide() : scene.debugLayer.show();
+                //scene.debugLayer.isVisible() ? scene.debugLayer.hide() : scene.debugLayer.show();
+                scene.debugLayer.show();
             },
             setTopView: function() {
                 projection.useView("top");
@@ -228,25 +229,42 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                 projection.useView("iso");
             },
             zoomIn: function() {
+                const focus = projection.getCurrentView().getFocusIsoPoint();
                 projection.zoomIn();
-                this.resize();
+                this.resize(focus);
             },
             zoomOut: function() {
+                const focus = projection.getCurrentView().getFocusIsoPoint();
                 projection.zoomOut();
-                this.resize();
+                this.resize(focus);
             },
-            resize: function() {
+            setZoom: function(zoompercent: number) {
+                const focus = projection.getCurrentView().getFocusIsoPoint();
+                projection.getCurrentView().setZoom(zoompercent);
+                this.resize(focus);
+            },
+            resize: function(focuspoint: Vector2|null) {
                 const viewrect = engine.getRenderingCanvasClientRect();
 
                 const ratio = viewrect.width / viewrect.height;
-                const halfOpening = projection.getCurrentView().getVerticalOpeningOrtho() / constants.SQRT2_DOUBLE;
+                const verticalOpening = projection.getCurrentView().getVerticalOpeningOrtho();
+                const horizontalOpening = verticalOpening * ratio;
+                const halfVerticalOpening = verticalOpening / 2;
+                const halfHorizontalOpening = horizontalOpening / 2;
 
-                const newWidth = halfOpening * ratio;
-
-                camera.orthoTop = halfOpening;
-                camera.orthoLeft = -Math.abs(newWidth);
-                camera.orthoRight = newWidth;
-                camera.orthoBottom = -Math.abs(halfOpening);
+                if(focuspoint) {
+                    console.log("AVANT", camera.orthoTop, camera.orthoBottom, camera.orthoRight, camera.orthoLeft);
+                    camera.orthoTop = focuspoint.y + halfVerticalOpening;
+                    camera.orthoBottom = focuspoint.y -halfVerticalOpening;
+                    camera.orthoRight = focuspoint.x + halfHorizontalOpening;
+                    camera.orthoLeft = focuspoint.x - halfHorizontalOpening;
+                    console.log("APRES", camera.orthoTop, camera.orthoBottom, camera.orthoRight, camera.orthoLeft);
+                } else {
+                    camera.orthoTop = halfVerticalOpening;
+                    camera.orthoBottom = -halfVerticalOpening;
+                    camera.orthoRight = halfHorizontalOpening;
+                    camera.orthoLeft = -halfHorizontalOpening;
+                }
 
                 engine.resize();
             },
@@ -256,53 +274,103 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
             },
             setMap: function(arenamap: any) {
 
+                // Grounds setup
                 arenamap.data.grounds.map((ground, index) => {
 
                     var groundmesh = new Mesh("ground" + index, scene);
-                    groundmesh.position = Vector3.Zero();
-                    //groundmesh.scaling = new Vector3(1, 1, -1);
-                    var groundMaterial = new StandardMaterial("groundmaterial", scene);
-                    groundMaterial.backFaceCulling = false;
-                    groundMaterial.disableLighting = true;
+                    groundmesh.position = new Vector3(0, -0.001, 0);
+
+                    const groundMaterial = new StandardMaterial("desert", scene);
+                    const desertTexture = new Texture(
+                        "data:image(desert)",
+                        scene,
+                        true,
+                        true,
+                        Texture.TRILINEAR_SAMPLINGMODE,
+                        () => null,
+                        () => null,
+                        assets.images.get("desert")
+                    );
+                    desertTexture.uScale = 50.0;
+                    desertTexture.vScale = 50.0;
+                    groundMaterial.diffuseTexture = desertTexture;
+                    groundMaterial.emissiveTexture = desertTexture;
+
                     groundmesh.material = groundMaterial;
+                    groundmesh.material.freeze();
 
-                    var positions = ground.mesh.map(triangle => {
-                        return [
-                            [triangle[0][0], 0, triangle[0][1]],
-                            [triangle[1][0], 0, triangle[1][1]],
-                            [triangle[2][0], 0, triangle[2][1]],
-                        ]
-                    });
-
-                    // connect the triangle dots ... counter clockwise
-                    var indices = [];
-                    
-                    for(var i = 0; i < positions.length; i++) {
-                        var offset = i*3;
-                        indices.push(offset+0, offset+1, offset+2); // connect vertices 0->1->2
-                    }
-                    
                     // Make a mesh shaper device.
                     var vertexData = new VertexData();
-
-                    // stuff its buffers with your stuff
-
-                    function flatten(arr) {
-                        return arr.reduce(function (flat, toFlatten) {
-                            return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-                        }, []);
-                    }
-
-                    vertexData.positions = flatten(positions);
-                    vertexData.indices = indices;
+                    vertexData.positions = ground.mesh.vertices;
+                    vertexData.indices = ground.mesh.indices;
+                    vertexData.uvs = ground.mesh.uvs;
                     
                     // Use the vertexData object.. to shape-ify blankmesh
                     vertexData.applyToMesh(groundmesh);
                 });
+
+                // Field objects setup
+                console.log(arenamap.data);
+                arenamap.data.objects.map((object, index) => {
+
+                    console.log(object, index);
+
+                    let objectInstance : RocksTallOreComponent;
+
+                    switch(object.type) {
+                        case "rocksTallOre": {
+                            objectInstance = new RocksTallOreComponent();
+                            break;
+                        }
+                        default: {
+                            throw new Error("Cannot find mesh type: " + object.type);
+                        }
+                    }
+
+                    objectInstance.init(scene);
+                    objectInstance.setPosition(
+                        object.point[0],      // x (latéral)
+                        object.point[1],      // z (profondeur)
+                    );
+                    objectInstance.setScale(new Vector3(object.diameter, object.diameter, object.diameter));
+
+                    // var groundmesh = new Mesh("ground" + index, scene);
+                    // groundmesh.position = new Vector3(0, -0.001, 0);
+
+                    // const groundMaterial = new StandardMaterial("desert", scene);
+                    // const desertTexture = new Texture(
+                    //     "data:image(desert)",
+                    //     scene,
+                    //     true,
+                    //     true,
+                    //     Texture.TRILINEAR_SAMPLINGMODE,
+                    //     () => null,
+                    //     () => null,
+                    //     assets.images.get("desert")
+                    // );
+                    // desertTexture.uScale = 50.0;
+                    // desertTexture.vScale = 50.0;
+                    // groundMaterial.diffuseTexture = desertTexture;
+                    // groundMaterial.emissiveTexture = desertTexture;
+
+                    // groundmesh.material = groundMaterial;
+                    // groundmesh.material.freeze();
+
+                    // // Make a mesh shaper device.
+                    // var vertexData = new VertexData();
+                    // vertexData.positions = ground.mesh.vertices;
+                    // vertexData.indices = ground.mesh.indices;
+                    // vertexData.uvs = ground.mesh.uvs;
+                    
+                    // // Use the vertexData object.. to shape-ify blankmesh
+                    // vertexData.applyToMesh(groundmesh);
+                });
+
+
             },
             setVizMessage: function(vizmsg: Vizmessage) {
 
-                const unitRatio = 1 / 50;
+                const unitRatio = 1.0;
 
                 const debugpoints = document.getElementById("debugpoints");
                 while(debugpoints.firstChild) {
@@ -330,30 +398,6 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                     agent.setPosition(agentinfo.Position[0] * unitRatio, agentinfo.Position[1] * unitRatio);
                     agent.setOrientation(agentinfo.Orientation);
                 });
-
-                var wall = new WallComponent();
-                wall.init(scene);
-                walls.set("wall", wall);
-
-                const startpos = [0, 0];
-                const endpos = [10, 10];
-                wall.setPosition(startpos[0] * unitRatio, startpos[1] * unitRatio, endpos[0] * unitRatio, endpos[1] * unitRatio);
-
-                // vizmsg.Obstacles.forEach(obstacleinfo => {
-
-                //     let wall = null;
-                //     if (!walls.has(obstacleinfo.Id)) {
-                //         wall = new WallComponent();
-                //         wall.init(scene);
-                //         walls.set(obstacleinfo.Id, wall);
-
-                //         const startpos = obstacleinfo.A;
-                //         const endpos = obstacleinfo.B;
-                //         console.log(obstacleinfo, startpos);
-
-                //         wall.setPosition(startpos[0] * unitRatio, startpos[1] * unitRatio, endpos[0] * unitRatio, endpos[1] * unitRatio);
-                //     }
-                // });
             }
         }
     };

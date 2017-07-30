@@ -41,7 +41,7 @@ export default class Wall implements SceneComponent {
         const vec = end.clone().sub(start);
         this.setLength(vec.mag());
 
-        console.log(vec.toArray(), vec.angle());
+        //console.log(vec.toArray(), vec.angle());
         
         //meshinstance.rotation.y = vec.angle();
         meshinstance.rotation.y = Math.atan2(vec.x, vec.y); // TODO(netgusto): figure out why x and y have to be interverted here relative to Vector2.angle()

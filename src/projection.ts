@@ -15,9 +15,9 @@ export default class Projection {
 
         this.views = new Map<string, OrthoViewAbstract>();
 
-        this.views.set("top", new OrthoViewTop("top", camera, 150));
-        this.views.set("front", new OrthoViewFront("front", camera, 150));
-        this.views.set("iso", new OrthoViewIsometric("iso", camera, 150));
+        this.views.set("top", new OrthoViewTop("top", camera, 15));
+        this.views.set("front", new OrthoViewFront("front", camera, 15));
+        this.views.set("iso", new OrthoViewIsometric("iso", camera, 15));
 
         this.useView(view);
     }
@@ -75,6 +75,8 @@ export default class Projection {
 
         const camIsoPos = currentview.getFocusIsoPoint();
         const actorIsoPos = currentview.isoPointFrom3DPoint(point);
+
+        //console.log(camIsoPos);
         
         // calculate vector to destination
         const travelIso = actorIsoPos.subtract(camIsoPos);

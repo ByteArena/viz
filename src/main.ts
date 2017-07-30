@@ -1,6 +1,6 @@
 // https://medium.com/@necsoft/three-js-101-hello-world-part-1-443207b1ebe1
 
-import { Engine } from 'babylonjs';
+import { Engine, Database } from 'babylonjs';
 
 import createScene from './scene';
 import comm from './comm';
@@ -8,12 +8,12 @@ import comm from './comm';
 export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number) : Promise<any> {
 
     const engine = new Engine(canvas, true);    // true: webgl AA
-    engine.enableOfflineSupport = false; // disable mesh in-browser cache (and the 404 error for manifest files)
+    engine.enableOfflineSupport = null; // disable mesh in-browser cache (and the 404 error for manifest files)
     //console.log(engine.getRenderingCanvasClientRect());
 
     const { scene, handles } = await createScene(engine, canvas);
 
-    window.addEventListener('resize', handles.resize);
+    window.addEventListener('resize', function(e) { handles.resize(); });
     window.addEventListener('click', handles.click);
 
     handles.resize();
@@ -46,10 +46,16 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
         e.stopPropagation();
         handles.zoomIn();
     });
+
     document.getElementById("zoomout").addEventListener("click", e => {
         e.stopPropagation();
         handles.zoomOut();
     });
+
+    // document.getElementById("zoomslider").addEventListener("input", e => {
+    //     e.stopPropagation();
+    //     handles.setZoom(e.target.value);
+    // });
 
     comm(wsurl, tps, handles.setMap, handles.setVizMessage);
 }

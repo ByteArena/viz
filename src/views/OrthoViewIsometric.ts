@@ -9,6 +9,8 @@ export default class OrthoViewIsometric extends OrthoViewAbstract {
         const { camera } = this;
         const camerax = (camera.orthoRight + camera.orthoLeft) / 2;
         const cameray = (camera.orthoTop + camera.orthoBottom) / 2;
+        //console.log(camerax, camera.orthoRight, camera.orthoLeft);
+        //console.log(cameray, camera.orthoTop + camera.orthoBottom);
 
         // http://clintbellanger.net/articles/isometric_math/
         const cameraxDivTILE_WIDTH_HALF = camerax / constants.SQRT2_HALF;

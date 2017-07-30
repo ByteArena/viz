@@ -59,6 +59,8 @@
     <button id="isoview">ISO</button>
     <button id="zoomout">-</button>
     <button id="zoomin">+</button>
+    <!--span style="color: white">zoom: <input id="zoomslider" type="range" value="50" step="10" min="10" /></span-->
+
 </div>
 
 <div id="screenspacepoint"></div>
@@ -66,10 +68,13 @@
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
     crossorigin="anonymous"></script>
-<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/35cb3a9b/dist/preview%20release/babylon.js"></script>
-<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.gridMaterial.min.js"></script>
+<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/v3.0.7/dist/preview%20release/babylon.js"></script>
+<!--script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.gridMaterial.min.js"></script-->
 <script src="/lib/bytearenaviz.min.js?{{.Rand}}"></script>
 <script>
+
+    window.BABYLON.Tools.GetClassName = function(e) { return ''; };
+
     (function () {
         window.ByteArena.startViz(
             document.getElementById('renderCanvas'),
