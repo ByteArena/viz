@@ -99,7 +99,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     assetsManager.addMeshTask("mesh:ship", "Ship", "/res/models/web/aliens/", "ship.babylon");
     assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", mapServer + "/" + map + "/res/models/", "rocksTallOre.babylon");
     assetsManager.addImageTask("image:shadow", "/res/img/textures/shadow.png");
-    assetsManager.addImageTask("image:desert", mapServer + "/" + map + "/res/textures/sand.jpg");
+    //assetsManager.addImageTask("image:desert", mapServer + "/" + map + "/res/textures/sand.jpg");
 
     const assets = await loadAssets(assetsManager);
 
@@ -130,10 +130,10 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
         new Vector3(0, 1, 0),
         scene
     );
-    light.intensity = 0.7;
+    light.intensity = 1.2;
     light.diffuse = new Color3(1, 1, 1);
     light.specular = new Color3(1, 1, 1);
-    light.groundColor = new Color3(0.2, 0.2, 0.2);  // make bottom shadows less harsh
+    //light.groundColor = new Color3(0.4, 0.4, 0.4);  // make bottom shadows less harsh
 
     /* ********************************************************************* */
     /* SCENE OBJECTS */
@@ -284,20 +284,21 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                     groundmesh.position = new Vector3(0, -0.001, 0);
 
                     const groundMaterial = new StandardMaterial("desert", scene);
-                    const desertTexture = new Texture(
-                        "data:image(desert)",
-                        scene,
-                        true,
-                        true,
-                        Texture.TRILINEAR_SAMPLINGMODE,
-                        () => null,
-                        () => null,
-                        assets.images.get("desert")
-                    );
-                    desertTexture.uScale = 50.0;
-                    desertTexture.vScale = 50.0;
-                    groundMaterial.diffuseTexture = desertTexture;
-                    groundMaterial.emissiveTexture = desertTexture;
+                    groundMaterial.diffuseColor = new Color3(.78, .52, .36);
+                    // const desertTexture = new Texture(
+                    //     "data:image(desert)",
+                    //     scene,
+                    //     true,
+                    //     true,
+                    //     Texture.TRILINEAR_SAMPLINGMODE,
+                    //     () => null,
+                    //     () => null,
+                    //     assets.images.get("desert")
+                    // );
+                    // desertTexture.uScale = 50.0;
+                    // desertTexture.vScale = 50.0;
+                    // groundMaterial.diffuseTexture = desertTexture;
+                    //groundMaterial.emissiveTexture = desertTexture;
 
                     groundmesh.material = groundMaterial;
                     groundmesh.material.freeze();
