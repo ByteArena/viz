@@ -35,6 +35,9 @@ type LoadedAssets = {
     textures: Map<string, Texture>,
 };
 
+const mapServer = "http://bytearena.com/maps";
+const map = "deathmatch/desert/death-valley";
+
 async function loadAssets(assetsManager: AssetsManager) : Promise<LoadedAssets> {
 
     return await new Promise<LoadedAssets>((resolve, reject) => {
@@ -94,9 +97,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     assetsManager.useDefaultLoadingScreen = false;
 
     assetsManager.addMeshTask("mesh:ship", "Ship", "/res/models/web/aliens/", "ship.babylon");
-    assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", "/res/models/web/kenney-space-kit/", "rocksTallOre.babylon");
+    assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", mapServer + "/" + map + "/res/models/", "rocksTallOre.babylon");
     assetsManager.addImageTask("image:shadow", "/res/img/textures/shadow.png");
-    assetsManager.addImageTask("image:desert", "/res/img/textures/desert2.jpg");
+    assetsManager.addImageTask("image:desert", mapServer + "/" + map + "/res/textures/sand.jpg");
 
     const assets = await loadAssets(assetsManager);
 
