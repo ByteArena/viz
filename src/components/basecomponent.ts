@@ -3,24 +3,11 @@ import { Mesh, InstancedMesh, Scene, SceneLoader, StandardMaterial, Color3, Text
 import SceneComponent from './scenecomponent';
 import * as constants from '../constants';
 
-export default class RocksTallOreComponent implements SceneComponent {
+export default abstract class BaseComponent implements SceneComponent {
 
-    private instance: InstancedMesh = null;
-    static mesh: Mesh = null;
+    protected instance: InstancedMesh = null;
 
-    static setup(mesh: Mesh) {
-        RocksTallOreComponent.mesh = mesh;
-    }
-
-    init(scene: Scene) : Promise<this> {
-
-        const randid = Math.random();
-        this.instance = RocksTallOreComponent.mesh.createInstance("rocktallore-" + randid);
-
-        this.instance.setEnabled(true);
-
-        return Promise.resolve(this);
-    }
+    abstract init(scene: Scene, id: string) : Promise<this>;
 
     destroy(scene: Scene) { }
     update(scene: Scene) { }
@@ -50,4 +37,3 @@ export default class RocksTallOreComponent implements SceneComponent {
         return this.instance.position;
     }
 }
-    

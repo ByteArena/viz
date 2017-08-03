@@ -14,9 +14,9 @@ import { Color3, Color4 } from 'babylonjs';
 
 import * as constants from './constants';
 import Projection from './projection';
-//import GridMaterial from './gridmaterial';
 import AgentComponent from './components/agent';
-import RocksTallOreComponent from './components/rocksTallOre';
+import SceneComponent from './components/scenecomponent';
+import BasicComponentBuilder from './components/BasicComponentBuilder';
 import IsoCursorComponent from './components/isocursor';
 
 import './protocol/vizmessage'
@@ -98,6 +98,10 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
 
     assetsManager.addMeshTask("mesh:ship", "Ship", "/res/models/web/aliens/", "ship.babylon");
     assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", mapServer + "/" + map + "/res/models/", "rocksTallOre.babylon");
+    assetsManager.addMeshTask("mesh:crater", "crater", mapServer + "/" + map + "/res/models/", "crater.babylon");
+    assetsManager.addMeshTask("mesh:rock02", "rocks", mapServer + "/" + map + "/res/models/", "rock02.babylon");
+    assetsManager.addMeshTask("mesh:rock03", "rocksSmall", mapServer + "/" + map + "/res/models/", "rock03.babylon");
+    assetsManager.addMeshTask("mesh:satellite01", "satelliteDishAntenna", mapServer + "/" + map + "/res/models/", "satellite01.babylon");
     assetsManager.addImageTask("image:shadow", "/res/img/textures/shadow.png");
     //assetsManager.addImageTask("image:desert", mapServer + "/" + map + "/res/textures/sand.jpg");
 
@@ -184,19 +188,25 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
 
     /* Obstacles meshs + materials */
 
-    const rocksTallOreMesh = assets.meshes.get("rocksTallOre");
-    
-    rocksTallOreMesh.convertToFlatShadedMesh();
-    const rocksTallOreMaterial = shipmesh.material as StandardMaterial;
-    rocksTallOreMaterial.unfreeze();
-    rocksTallOreMaterial.specularColor = new Color3(0, 0, 0);
-    rocksTallOreMaterial.emissiveTexture = rocksTallOreMaterial.diffuseTexture;
-    rocksTallOreMaterial.emissiveColor = new Color3(0, 0, 0);
-    rocksTallOreMaterial.freeze();
+    /* Rocks01 */
 
-    RocksTallOreComponent.setup(
-        rocksTallOreMesh
-    );
+    const Rock01Component = BasicComponentBuilder();
+    Rock01Component.setup(assets.meshes.get("rocksTallOre"));
+
+    const Rock02Component = BasicComponentBuilder();
+    Rock02Component.setup(assets.meshes.get("rock02"));
+
+    const Rock03Component = BasicComponentBuilder();
+    Rock03Component.setup(assets.meshes.get("rock03"));
+
+    const Crater01Component = BasicComponentBuilder();
+    Crater01Component.setup(assets.meshes.get("crater"));
+
+    // const Crater02Component = BasicComponentBuilder();
+    // Crater02Component.setup(assets.meshes.get("crater02"));
+
+    const Satellite01Component = BasicComponentBuilder();
+    Satellite01Component.setup(assets.meshes.get("satellite01"));
 
     /* ********************************************************************* */
     /* MECANICS */
@@ -256,12 +266,12 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                 const halfHorizontalOpening = horizontalOpening / 2;
 
                 if(focuspoint) {
-                    console.log("AVANT", camera.orthoTop, camera.orthoBottom, camera.orthoRight, camera.orthoLeft);
+                    //console.log("AVANT", camera.orthoTop, camera.orthoBottom, camera.orthoRight, camera.orthoLeft);
                     camera.orthoTop = focuspoint.y + halfVerticalOpening;
                     camera.orthoBottom = focuspoint.y -halfVerticalOpening;
                     camera.orthoRight = focuspoint.x + halfHorizontalOpening;
                     camera.orthoLeft = focuspoint.x - halfHorizontalOpening;
-                    console.log("APRES", camera.orthoTop, camera.orthoBottom, camera.orthoRight, camera.orthoLeft);
+                    //console.log("APRES", camera.orthoTop, camera.orthoBottom, camera.orthoRight, camera.orthoLeft);
                 } else {
                     camera.orthoTop = halfVerticalOpening;
                     camera.orthoBottom = -halfVerticalOpening;
@@ -314,16 +324,18 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                 });
 
                 // Field objects setup
-                console.log(arenamap.data);
+
                 arenamap.data.objects.map((object, index) => {
 
-                    console.log(object, index);
-
-                    let objectInstance : RocksTallOreComponent;
+                    let objectInstance : SceneComponent;
 
                     switch(object.type) {
-                        case "rocksTallOre": {
-                            objectInstance = new RocksTallOreComponent();
+                        case "rock01": {
+                            objectInstance = new Rock01Component();
+                            break;
+                        }
+                        case "crater01": {
+                            objectInstance = new Satellite01Component();
                             break;
                         }
                         default: {
@@ -331,7 +343,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
                         }
                     }
 
-                    objectInstance.init(scene);
+                    objectInstance.init(scene, object.id);
                     objectInstance.setPosition(
                         object.point[0],      // x (latéral)
                         object.point[1],      // z (profondeur)
