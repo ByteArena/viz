@@ -11,7 +11,7 @@ import BasicComponentBuilder from './components/BasicComponentBuilder';
 import IsoCursorComponent from './components/isocursor';
 
 import AwesomeCamera from './awesomecamera';
-import loadAssets from './loadAssets';
+import loadAssets from './loadassets';
 import './protocol/vizmessage'
 
 //import GridMaterial from './gridmaterial';
