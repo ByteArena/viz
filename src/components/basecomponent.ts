@@ -10,7 +10,7 @@ export default abstract class BaseComponent implements SceneComponent {
     abstract init(scene: Scene, id: string) : Promise<this>;
 
     destroy(scene: Scene) { }
-    update(scene: Scene) { }
+    update(scene: Scene, options: any) { }
 
     setPosition(x: number, y: number) {
         const { instance } = this;

@@ -32,14 +32,14 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
         handles.setTopView();
     });
 
-    document.getElementById("isoview").addEventListener("click", e => {
-        e.stopPropagation();
-        handles.setISOView();
-    });
-
     document.getElementById("frontview").addEventListener("click", e => {
         e.stopPropagation();
         handles.setFrontView();
+    });
+
+    document.getElementById("isoview").addEventListener("click", e => {
+        e.stopPropagation();
+        handles.setISOView();
     });
 
     document.getElementById("zoomin").addEventListener("click", e => {

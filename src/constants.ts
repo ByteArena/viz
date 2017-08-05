@@ -12,5 +12,5 @@ export const ISORATIO_TRUEISO = 1;   // true ISO; w/h = 1;  angle from camera to
 export const ISORATIO_ONEANDHALF = 1.5;   // w/h = 1.5; angle from camera to ground = atan(1.5) = 56.31°
 export const ISORATIO_DIABLO = 4/3;   // w/h = 4.3; angle from camera to ground = atan(4/3) = 53.13° (diablo like)
 
-export const ISORATIO = ISORATIO_ORIG;
+export const ISORATIO = ISORATIO_TRUEISO;
 export const CAMERA_ALTITUDE = 10.0;

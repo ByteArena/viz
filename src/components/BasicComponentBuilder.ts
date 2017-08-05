@@ -23,7 +23,7 @@ export default function BasicComponentBuilder() {
 
     res.setup = function(mesh: Mesh) {
         res.mesh = mesh;
-        console.log("MESH?", mesh);
+
         mesh.convertToFlatShadedMesh();
         const meshMaterial = mesh.material as StandardMaterial;
         meshMaterial.unfreeze();
