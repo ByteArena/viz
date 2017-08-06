@@ -168,6 +168,12 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
         }
     });
 
+    /*********************************************************************** */
+    /* Debug container                                                       */
+    /*********************************************************************** */
+
+    scene
+
     return {
         scene,
         handles: {
@@ -290,18 +296,18 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
 
                 const unitRatio = 1.0;
 
-                const debugpoints = document.getElementById("debugpoints");
-                while(debugpoints.firstChild) {
-                    debugpoints.removeChild(debugpoints.firstChild);
-                }
+                // const debugpoints = document.getElementById("debugpoints");
+                // while(debugpoints.firstChild) {
+                //     debugpoints.removeChild(debugpoints.firstChild);
+                // }
 
-                vizmsg.DebugPoints.concat(vizmsg.DebugIntersects).forEach((debugpoint, index) => {
-                    const projected = projection.project3DToScreenSpace(new Vector3(debugpoint[0] * unitRatio, 0, debugpoint[1] * unitRatio));
-                    const newDebugPoint: HTMLDivElement = document.createElement("div");
-                    newDebugPoint.style.left = projected.x + "px";
-                    newDebugPoint.style.top = projected.y + "px";
-                    debugpoints.appendChild(newDebugPoint);
-                });
+                // vizmsg.DebugPoints.concat(vizmsg.DebugIntersects).forEach((debugpoint, index) => {
+                //     const projected = projection.project3DToScreenSpace(new Vector3(debugpoint[0] * unitRatio, 0, debugpoint[1] * unitRatio));
+                //     const newDebugPoint: HTMLDivElement = document.createElement("div");
+                //     newDebugPoint.style.left = projected.x + "px";
+                //     newDebugPoint.style.top = projected.y + "px";
+                //     debugpoints.appendChild(newDebugPoint);
+                // });
 
                 vizmsg.Agents.forEach(agentinfo => {
                     let agent = null;
