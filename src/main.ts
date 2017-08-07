@@ -1,9 +1,10 @@
 // https://medium.com/@necsoft/three-js-101-hello-world-part-1-443207b1ebe1
 
-import { Engine, Database } from 'babylonjs';
+import { Engine } from 'babylonjs';
 
 import createScene from './scene';
 import comm from './comm';
+import {newReplay} from './replay';
 
 export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number) : Promise<any> {
 
@@ -56,6 +57,11 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
     //     e.stopPropagation();
     //     handles.setZoom(e.target.value);
     // });
+
+    newReplay("http://static.bytearena.com/records/record-2.bin", {
+      setMap: handles.setMap,
+      setVizMessage: handles.setVizMessage,
+    })
 
     comm(wsurl, tps, handles.setMap, handles.setVizMessage);
 }

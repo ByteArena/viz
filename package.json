@@ -27,6 +27,7 @@
     "babylonjs": "^3.1.0-alpha1",
     "chokidar-cli": "^1.2.0",
     "eslint": "^4.3.0",
+    "http-server": "^0.10.0",
     "live-server": "^1.2.0",
     "parallelshell": "^3.0.1",
     "rollup": "^0.45.2",
@@ -39,6 +40,7 @@
   },
   "dependencies": {
     "bytearena-sdk": "0.0.1",
-    "denque": "^1.1.1"
+    "denque": "^1.1.1",
+    "stream-http": "^2.7.2"
   }
 }

@@ -296,6 +296,8 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
 
                 const unitRatio = 1.0;
 
+                console.log("setVizMessage", vizmsg)
+
                 // const debugpoints = document.getElementById("debugpoints");
                 // while(debugpoints.firstChild) {
                 //     debugpoints.removeChild(debugpoints.firstChild);
