@@ -4,7 +4,6 @@ import { Engine } from 'babylonjs';
 
 import createScene from './scene';
 import comm from './comm';
-import {newReplay} from './replay';
 
 export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number) : Promise<any> {
 
@@ -58,17 +57,5 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
     //     handles.setZoom(e.target.value);
     // });
 
-    const query = window.queryString.parse(location.search)
-
-    if (query.replay !== undefined) {
-
-      newReplay("http://static.bytearena.com/records/record-" + query.replay + ".bin", {
-        setMap: handles.setMap,
-        setVizMessage: handles.setVizMessage,
-        tps,
-      });
-    } else {
-
-      comm(wsurl, tps, handles.setMap, handles.setVizMessage);
-    }
+    comm(wsurl, tps, handles.setMap, handles.setVizMessage);
 }
