@@ -9,6 +9,7 @@ export class Bucket {
 
     public addFrames(frames: Frame[]) {
         frames.map(frame => this.frames.push(frame));
+        // console.log(this.frames.length, "in bucket");
     }
 
     public next3(): [Frame, Frame, Frame] | undefined {

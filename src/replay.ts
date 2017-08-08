@@ -4,6 +4,7 @@ import expandAndInterpolateBatch from './expandinterpolate';
 let chunkBuffer = "";
 let interval;
 let bufferBatches = [];
+let frameBuffer = [];
 let stopDownloading = false;
 
 let totalLines = 0;
@@ -46,38 +47,49 @@ export function newReplay(url, {setMap, setVizMessage, tps}) {
 
   interval = window.setInterval(function() {
 
-      try {
-        console.log(bufferBatches.length, "batche(s) buffered");
+      // console.log(frameBuffer.length, "frame(s) buffered");
 
-        if (bufferBatches.length === 0) {
-          if (stopDownloading === true) {
-            clearInterval(interval)
-          }
-
-          return;
+      if (frameBuffer.length === 0) {
+        if (stopDownloading === true) {
+          clearInterval(interval)
         }
 
-        const frames = bufferBatches.shift();
-
-        console.log("parsed", frames.length, "frame(s)");
-
-        bucket.addFrames(frames.map(Frame.fromVizmessage));
-
-      } catch (e) {
-        console.error("Could not parse frame", e.message);
+        return;
       }
+
+      const frame = frameBuffer.shift();
+      setVizMessage(frame);
+      return;
+
+      bucket.addFrames([
+        Frame.fromVizmessage(frame)
+      ]);
+
+      // console.log("setVizMessage", frames.map(Frame.fromVizmessage))
 
       const next3 = bucket.next3();
       if(next3 !== undefined) {
           bucket.consumeOne();
           expandAndInterpolateBatch(next3, tps, 60, setVizMessage);   // TODO: remove 60 (fps) and rely on rAF rate
       }
-    }, 1000);
+    }, 1000/tps);
 }
 
 
 function onBatches(batches) {
   bufferBatches = [...bufferBatches, ...batches.map(JSON.parse)];
+  frameBuffer = [...frameBuffer, ...flatten(bufferBatches)];
 
   totalLines += batches.length
+}
+
+function flatten(arr) {
+  return arr.reduce(
+    function(flat, toFlatten) {
+      return flat.concat(
+        Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
+      );
+    },
+    []
+  );
 }
