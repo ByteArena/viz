@@ -58,10 +58,17 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
     //     handles.setZoom(e.target.value);
     // });
 
-    newReplay("http://static.bytearena.com/records/record-2.bin", {
-      setMap: handles.setMap,
-      setVizMessage: handles.setVizMessage,
-    })
+    const query = window.queryString.parse(location.search)
 
-    comm(wsurl, tps, handles.setMap, handles.setVizMessage);
+    if (query.replay !== undefined) {
+
+      newReplay("http://static.bytearena.com/records/record-" + query.replay + ".bin", {
+        setMap: handles.setMap,
+        setVizMessage: handles.setVizMessage,
+        tps,
+      });
+    } else {
+
+      comm(wsurl, tps, handles.setMap, handles.setVizMessage);
+    }
 }
