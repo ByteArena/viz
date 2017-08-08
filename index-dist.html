@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<head>
+<meta charset="utf-8">
+<style>
+    html,
+    body {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: silver;
+    }
+
+    #renderCanvas {
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+    }
+
+    #controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+
+    #debugpoints div, #screenspacepoint {
+        position: absolute;
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 100%;
+        background-color: red;
+        margin-left: -3px;
+        margin-top: -3px;
+        z-index: 100;
+    }
+
+    #screenspacepoint {
+        width: 10px;
+        height: 10px;
+        background-color: orange;
+        margin-left: -5px;
+        margin-top: -5px;
+    }
+
+    #arenaname {
+        position: absolute;
+    }
+
+</style>
+
+<script src="https://bundle.run/stream-http@2.7.2"></script>
+<script src="https://bundle.run/query-string@5.0.0"></script>
+</head>
+
+<body>
+<canvas id="renderCanvas"></canvas>
+<div id="controls">
+    <button id="debug">debug</button>
+    <button id="topview">Top</button>
+    <button id="frontview">Front</button>
+    <button id="isoview">ISO</button>
+    <button id="zoomout">-</button>
+    <button id="zoomin">+</button>
+
+</div>
+
+<div id="screenspacepoint"></div>
+<div id="debugpoints"></div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+    crossorigin="anonymous"></script>
+<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/v3.0.7/dist/preview%20release/babylon.js"></script>
+<!--script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/v3.0.7/dist/preview%20release/gui/babylon.gui.min.js"></script-->
+<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.gridMaterial.min.js"></script>
+<script src="/bytearenaviz.min.js?{{.Rand}}"></script>
+<script>
+
+    window.BABYLON.Tools.GetClassName = function(e) { return ''; };
+
+    (function () {
+        window.ByteArena.startViz(
+            document.getElementById('renderCanvas'),
+            "{{.WsURL}}",
+            "{{.Tps}}"
+        );
+    })();
+
+</script>
+</body>
+</html>
