@@ -6,13 +6,13 @@ import createScene from './scene';
 import comm from './comm';
 import {newReplay} from './replay';
 
-export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number, cdnUrl: string) : Promise<any> {
+export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number) : Promise<any> {
 
     const engine = new Engine(canvas, true);    // true: webgl AA
     engine.enableOfflineSupport = null; // disable mesh in-browser cache (and the 404 error for manifest files)
     //console.log(engine.getRenderingCanvasClientRect());
 
-    const { scene, handles } = await createScene(engine, canvas, cdnUrl);
+    const { scene, handles } = await createScene(engine, canvas);
 
     window.addEventListener('resize', function(e) { handles.resize(); });
     window.addEventListener('click', handles.click);
@@ -58,9 +58,11 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
     //     handles.setZoom(e.target.value);
     // });
 
-    if (IS_REPLAY) {
+    const query = window.queryString.parse(location.search)
 
-      newReplay("http://static.bytearena.com/records/record-" + location.pathname.substr(1) + ".bin", {
+    if (query.replay !== undefined) {
+
+      newReplay("http://static.bytearena.com/records/record-" + query.replay + ".bin", {
         setMap: handles.setMap,
         setVizMessage: handles.setVizMessage,
         tps,
