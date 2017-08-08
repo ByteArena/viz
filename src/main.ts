@@ -1,6 +1,6 @@
 // https://medium.com/@necsoft/three-js-101-hello-world-part-1-443207b1ebe1
 
-import { Engine, Database } from 'babylonjs';
+import { Engine } from 'babylonjs';
 
 import createScene from './scene';
 import comm from './comm';

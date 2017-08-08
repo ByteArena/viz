@@ -32,13 +32,13 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     const assetsManager = new AssetsManager(scene);
     assetsManager.useDefaultLoadingScreen = false;
 
-    assetsManager.addMeshTask("mesh:ship", "Ship", "/res/models/web/aliens/", "ship.babylon");
+    assetsManager.addMeshTask("mesh:ship", "Ship", mapServer + "/res/models/web/aliens/", "ship.babylon");
     assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", mapServer + "/" + map + "/res/models/", "rocksTallOre.babylon");
     assetsManager.addMeshTask("mesh:crater", "crater", mapServer + "/" + map + "/res/models/", "crater.babylon");
     assetsManager.addMeshTask("mesh:rock02", "rocks", mapServer + "/" + map + "/res/models/", "rock02.babylon");
     assetsManager.addMeshTask("mesh:rock03", "rocksSmall", mapServer + "/" + map + "/res/models/", "rock03.babylon");
     assetsManager.addMeshTask("mesh:satellite01", "satelliteDishAntenna", mapServer + "/" + map + "/res/models/", "satellite01.babylon");
-    assetsManager.addImageTask("image:shadow", "/res/img/textures/shadow.png");
+    assetsManager.addImageTask("image:shadow", mapServer + "/res/img/textures/shadow.png");
     //assetsManager.addImageTask("image:desert", mapServer + "/" + map + "/res/textures/sand.jpg");
 
     const assets = await loadAssets(assetsManager);
