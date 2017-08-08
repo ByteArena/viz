@@ -10,5 +10,8 @@ module.exports = {
     'rules': {
         'no-unused-vars': [2, {"args": "none"}],
         'no-console': 0
+    },
+    'globals': {
+      'IS_REPLAY': true
     }
 };

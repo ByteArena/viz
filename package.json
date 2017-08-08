@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/",
     "build:js": "rollup -c rollup.config.js",
+    "build:replay": "IS_REPLAY=true rollup -c rollup.config.js",
     "build": "npm run --silent lint && npm run --silent build:js",
     "_watch:dev": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build'",
     "_watch:dev:nolint": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build:js'",
@@ -35,6 +36,7 @@
     "rollup-plugin-babili": "^3.0.0",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^1.1.1",
     "rollup-watch": "^4.3.1",
     "typescript": "^2.3.2"
   },

@@ -3,6 +3,7 @@ import babili from 'rollup-plugin-babili';
 import typescript from '@alexlur/rollup-plugin-typescript';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
+import replace from 'rollup-plugin-replace';
 
 import fs from 'fs';
 const pkge = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -21,6 +22,11 @@ export default {
             "banner": "/* ByteArena Viz v" + pkge.version + "; License " + pkge.license + "; " + pkge.homepage + " */",
             //"sourcemap": false
         }),
+
+        replace({
+          IS_REPLAY: JSON.stringify(process.env.IS_REPLAY)
+        }),
+
         typescript(),
 
         nodeResolve({
