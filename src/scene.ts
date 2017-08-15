@@ -34,7 +34,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     assetsManager.useDefaultLoadingScreen = false;
 
     assetsManager.addMeshTask("mesh:ship", "Ship", agentsUrl + "/redship/", "ship.babylon");
-    assetsManager.addImageTask("image:shadow", agentsUrl + "/redship/shadow.png");
+    assetsManager.addImageTask("image:shadow", agentsUrl + "/redship/shadow.jpg");
 
     assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", themeUrl + "/models/", "rocksTallOre.babylon");
     assetsManager.addMeshTask("mesh:crater", "crater", themeUrl + "/models/", "crater.babylon");
@@ -42,7 +42,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     assetsManager.addMeshTask("mesh:rock03", "rocksSmall", themeUrl + "/models/", "rock03.babylon");
     assetsManager.addMeshTask("mesh:satellite01", "satelliteDishAntenna", themeUrl + "/models/", "satellite01.babylon");
     
-    //assetsManager.addImageTask("image:desert", mapServer + "/" + map + "/res/textures/sand.jpg");
+    assetsManager.addImageTask("image:desert", themeUrl + "/textures/sand-ripples-seamless-orange.jpg");
 
     const assets = await loadAssets(assetsManager);
 
@@ -106,8 +106,12 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     
 
     const shadowMaterial = new StandardMaterial("shadow", scene);
-    shadowMaterial.emissiveTexture = new Texture("data:res/img/textures/shadow.png", scene, true, true, Texture.TRILINEAR_SAMPLINGMODE, () => null, () => null, assets.images.get("shadow"));
-    shadowMaterial.opacityTexture = shadowMaterial.emissiveTexture;
+    const shadowTexture = new Texture("data:image(shadow)", scene, true, true, Texture.TRILINEAR_SAMPLINGMODE, () => null, () => null, assets.images.get("shadow"));
+    //shadowMaterial.emissiveTexture = shadowTexture;
+    //shadowMaterial.emissiveTexture = shadowTexture;
+    shadowMaterial.diffuseTexture = shadowTexture;
+    //shadowMaterial.opacityTexture = shadowTexture;
+    shadowMaterial.opacityTexture = shadowTexture;
     shadowMaterial.alphaMode = Engine.ALPHA_MULTIPLY;
     shadowmesh.material = shadowMaterial;
     shadowmesh.material.freeze();
@@ -203,21 +207,23 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     groundmesh.position = new Vector3(0, -0.001, 0);
 
                     const groundMaterial = new StandardMaterial("desert", scene);
-                    groundMaterial.diffuseColor = new Color3(.78, .52, .36);
-                    // const desertTexture = new Texture(
-                    //     "data:image(desert)",
-                    //     scene,
-                    //     true,
-                    //     true,
-                    //     Texture.TRILINEAR_SAMPLINGMODE,
-                    //     () => null,
-                    //     () => null,
-                    //     assets.images.get("desert")
-                    // );
-                    // desertTexture.uScale = 50.0;
-                    // desertTexture.vScale = 50.0;
-                    // groundMaterial.diffuseTexture = desertTexture;
+                    const desertTexture = new Texture(
+                        "data:image(desert)",
+                        scene,
+                        true,
+                        true,
+                        Texture.TRILINEAR_SAMPLINGMODE,
+                        () => null,
+                        () => null,
+                        assets.images.get("desert")
+                    );
+                    desertTexture.uScale = 7.0;
+                    desertTexture.vScale = 7.0;
+                    groundMaterial.diffuseTexture = desertTexture;
+                    groundMaterial.bumpTexture = desertTexture;
                     //groundMaterial.emissiveTexture = desertTexture;
+                    //groundMaterial.emissiveColor = Color3.Red();
+                    //groundMaterial.useEmissiveAsIllumination = true;
 
                     groundmesh.material = groundMaterial;
                     groundmesh.material.freeze();
