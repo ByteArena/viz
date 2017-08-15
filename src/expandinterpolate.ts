@@ -57,7 +57,7 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
     const fpt = targetfps / tps;
     const nbSynthesizedFrames = fpt - 1;
 
-    const synthesizeFrame = function (framenum = 0) {
+    const synthesizeFrame = function (framenum) {
         const interpolatedframe = thisframe;
         const timeratio = framenum / fpt;
 
@@ -77,8 +77,8 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
         }
     };
 
-    sendFrame(thisframe);
-    window.requestAnimationFrame(synthesizeFrame.bind(null, 1));
+    //sendFrame(thisframe);
+    window.requestAnimationFrame(synthesizeFrame.bind(null, 0));
 
     // TODO: achieve 3 points interpolation
 

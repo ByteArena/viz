@@ -5,13 +5,13 @@ import { Engine } from 'babylonjs';
 import createScene from './scene';
 import comm from './comm';
 
-export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number) : Promise<any> {
+export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps: number, cdnbaseurl: string) : Promise<any> {
 
     const engine = new Engine(canvas, true);    // true: webgl AA
     engine.enableOfflineSupport = null; // disable mesh in-browser cache (and the 404 error for manifest files)
     //console.log(engine.getRenderingCanvasClientRect());
 
-    const { scene, handles } = await createScene(engine, canvas);
+    const { scene, handles } = await createScene(engine, canvas, cdnbaseurl);
 
     window.addEventListener('resize', function(e) { handles.resize(); });
     window.addEventListener('click', handles.click);

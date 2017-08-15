@@ -17,11 +17,12 @@ import './protocol/vizmessage'
 //import GridMaterial from './gridmaterial';
 
 const scenestate = { pickpos: null };
-const mapServer = "http://bytearena.com/maps";
-const map = "deathmatch/desert/death-valley";
 
+export default async function createScene(engine: Engine, canvas: HTMLElement, assetsUrl: string = "http://bytearena.com/assets/bytearena") : Promise<any> {
 
-export default async function createScene(engine: Engine, canvas: HTMLElement) : Promise<any> {
+    const mapUrl = assetsUrl + "/maps/deathmatch/desert/death-valley";
+    const themeUrl = assetsUrl + "/themes/desert";
+    const agentsUrl = assetsUrl + "/agents";
 
     /* ********************************************************************* */
     /* SCENE */
@@ -32,13 +33,15 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     const assetsManager = new AssetsManager(scene);
     assetsManager.useDefaultLoadingScreen = false;
 
-    assetsManager.addMeshTask("mesh:ship", "Ship", mapServer + "/res/models/web/aliens/", "ship.babylon");
-    assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", mapServer + "/" + map + "/res/models/", "rocksTallOre.babylon");
-    assetsManager.addMeshTask("mesh:crater", "crater", mapServer + "/" + map + "/res/models/", "crater.babylon");
-    assetsManager.addMeshTask("mesh:rock02", "rocks", mapServer + "/" + map + "/res/models/", "rock02.babylon");
-    assetsManager.addMeshTask("mesh:rock03", "rocksSmall", mapServer + "/" + map + "/res/models/", "rock03.babylon");
-    assetsManager.addMeshTask("mesh:satellite01", "satelliteDishAntenna", mapServer + "/" + map + "/res/models/", "satellite01.babylon");
-    assetsManager.addImageTask("image:shadow", mapServer + "/res/img/textures/shadow.png");
+    assetsManager.addMeshTask("mesh:ship", "Ship", agentsUrl + "/redship/", "ship.babylon");
+    assetsManager.addImageTask("image:shadow", agentsUrl + "/redship/shadow.png");
+
+    assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", themeUrl + "/models/", "rocksTallOre.babylon");
+    assetsManager.addMeshTask("mesh:crater", "crater", themeUrl + "/models/", "crater.babylon");
+    assetsManager.addMeshTask("mesh:rock02", "rocks", themeUrl + "/models/", "rock02.babylon");
+    assetsManager.addMeshTask("mesh:rock03", "rocksSmall", themeUrl + "/models/", "rock03.babylon");
+    assetsManager.addMeshTask("mesh:satellite01", "satelliteDishAntenna", themeUrl + "/models/", "satellite01.babylon");
+    
     //assetsManager.addImageTask("image:desert", mapServer + "/" + map + "/res/textures/sand.jpg");
 
     const assets = await loadAssets(assetsManager);
@@ -171,8 +174,6 @@ export default async function createScene(engine: Engine, canvas: HTMLElement) :
     /*********************************************************************** */
     /* Debug container                                                       */
     /*********************************************************************** */
-
-    scene
 
     return {
         scene,
