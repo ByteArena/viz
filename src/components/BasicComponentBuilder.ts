@@ -28,7 +28,7 @@ export default function BasicComponentBuilder() {
         const meshMaterial = mesh.material as StandardMaterial;
         meshMaterial.unfreeze();
         meshMaterial.specularColor = new Color3(0, 0, 0);
-        meshMaterial.emissiveTexture = meshMaterial.diffuseTexture;
+        //meshMaterial.emissiveTexture = meshMaterial.diffuseTexture;
         meshMaterial.emissiveColor = new Color3(0, 0, 0);
         meshMaterial.freeze();
     }

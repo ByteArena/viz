@@ -36,4 +36,8 @@ export default abstract class BaseComponent implements SceneComponent {
         if(this.instance === null) return Vector3.Zero();
         return this.instance.position;
     }
+    
+    getInstancedMesh() : InstancedMesh {
+        return this.instance;
+    }
 }

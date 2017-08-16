@@ -23,6 +23,12 @@
         position: absolute;
         bottom: 0;
         left: 0;
+        padding: 5px;
+        border-top-right-radius: 10px;
+        background-color: #777;
+        color: white;
+        font-family: sans-serif;
+        font-size: 10px;
     }
 
     #debugpoints div, #screenspacepoint {
@@ -58,9 +64,16 @@
     <button id="debug">debug</button>
     <button id="topview">Top</button>
     <button id="frontview">Front</button>
-    <button id="isoview">ISO</button>
-    <button id="zoomout">-</button>
-    <button id="zoomin">+</button>
+    <button id="isoview">Strategic</button>
+    &nbsp;|&nbsp;
+    <label><input type="radio" name="projection" value="standard" checked="checked">Standard</label>
+    <label><input type="radio" name="projection" value="isometric">Isometric</label>
+    &nbsp;|&nbsp;
+    <label><input type="radio" name="altitude" value="high" checked="checked">High altitude</label>
+    <label><input type="radio" name="altitude" value="low">Low altitude</label>
+    &nbsp;|&nbsp;
+    <button id="zoomout">Zoom -</button>
+    <button id="zoomin">Zoom +</button>
 
 </div>
 
@@ -72,6 +85,7 @@
 <script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/v3.0.7/dist/preview%20release/babylon.js"></script>
 <!--script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/v3.0.7/dist/preview%20release/gui/babylon.gui.min.js"></script-->
 <script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.gridMaterial.min.js"></script>
+<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.skyMaterial.min.js"></script>
 <script src="/lib/bytearenaviz.min.js?{{.Rand}}"></script>
 <script>
 

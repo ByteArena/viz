@@ -1,5 +1,5 @@
 import { Engine, Scene, Mesh, FreeCamera } from 'babylonjs';
-import { HemisphericLight, DirectionalLight } from 'babylonjs';
+import { HemisphericLight, DirectionalLight, ShadowGenerator } from 'babylonjs';
 import { AssetsManager, VertexData, Vector3, Color3, Color4 } from 'babylonjs';
 import { StandardMaterial, Texture } from 'babylonjs';
 
@@ -18,7 +18,7 @@ import './protocol/vizmessage'
 
 const scenestate = { pickpos: null };
 
-export default async function createScene(engine: Engine, canvas: HTMLElement, assetsUrl: string = "http://bytearena.com/assets/bytearena") : Promise<any> {
+export default async function createScene(engine: Engine, canvas: HTMLElement, assetsUrl: string) : Promise<any> {
 
     const mapUrl = assetsUrl + "/maps/deathmatch/desert/death-valley";
     const themeUrl = assetsUrl + "/themes/desert";
@@ -33,16 +33,24 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     const assetsManager = new AssetsManager(scene);
     assetsManager.useDefaultLoadingScreen = false;
 
-    assetsManager.addMeshTask("mesh:ship", "Ship", agentsUrl + "/redship/", "ship.babylon");
+    //assetsManager.addMeshTask("mesh:ship", "Ship", agentsUrl + "/redship/", "ship.babylon");
+    assetsManager.addMeshTask("mesh:ship", "main", themeUrl + "/models/", "spaceCraft04.babylon");
     assetsManager.addImageTask("image:shadow", agentsUrl + "/redship/shadow.jpg");
 
-    assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", themeUrl + "/models/", "rocksTallOre.babylon");
-    assetsManager.addMeshTask("mesh:crater", "crater", themeUrl + "/models/", "crater.babylon");
-    assetsManager.addMeshTask("mesh:rock02", "rocks", themeUrl + "/models/", "rock02.babylon");
-    assetsManager.addMeshTask("mesh:rock03", "rocksSmall", themeUrl + "/models/", "rock03.babylon");
-    assetsManager.addMeshTask("mesh:satellite01", "satelliteDishAntenna", themeUrl + "/models/", "satellite01.babylon");
+    //assetsManager.addMeshTask("mesh:rocksTallOre", "rocksTallOre", themeUrl + "/models/", "rocksTallOre.babylon");
+    assetsManager.addMeshTask("mesh:rocks01", "rocksTall", themeUrl + "/models/", "rocksTall.babylon");
+    assetsManager.addMeshTask("mesh:rocks02", "main", themeUrl + "/models/", "rocks02.babylon");
+    assetsManager.addMeshTask("mesh:crater01", "crater", themeUrl + "/models/", "crater01.babylon");
+    assetsManager.addMeshTask("mesh:crater02", "craterLarge", themeUrl + "/models/", "crater02.babylon");
+    assetsManager.addMeshTask("mesh:satellite01", "main", themeUrl + "/models/", "satellite01.babylon");
+    assetsManager.addMeshTask("mesh:satellite02", "main", themeUrl + "/models/", "satellite02.babylon");
+    assetsManager.addMeshTask("mesh:alienbones", "main", themeUrl + "/models/", "alienBones.babylon");
+    assetsManager.addMeshTask("mesh:alienbones", "main", themeUrl + "/models/", "alienBones.babylon");
+    assetsManager.addMeshTask("mesh:station01", "main", themeUrl + "/models/", "station01.babylon");
+    assetsManager.addMeshTask("mesh:station02", "main", themeUrl + "/models/", "station02.babylon");
     
-    assetsManager.addImageTask("image:desert", themeUrl + "/textures/sand-ripples-seamless-orange.jpg");
+    //assetsManager.addImageTask("image:desert", themeUrl + "/textures/sand-ripples-seamless-orange.jpg");
+    assetsManager.addImageTask("image:desert", themeUrl + "/textures/seamless-clay.jpg");
 
     const assets = await loadAssets(assetsManager);
 
@@ -50,7 +58,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     /* CAMERA */
     /* ********************************************************************* */
 
-    const awcam = new AwesomeCamera(scene);
+    const awcam = new AwesomeCamera(scene, false);
     const projection = new Projection(scene);
 
     /* ********************************************************************* */
@@ -62,8 +70,8 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
         new Vector3(0, 1, 0),
         scene
     );
-    light.intensity = 0.7;
-    light.diffuse = new Color3(1, 1, 1);
+    light.intensity = 0.95;
+    light.diffuse = new Color3(0.7, 0.8, 1.0);
     light.specular = new Color3(0, 0, 0);
     //light.groundColor = new Color3(0.4, 0.4, 0.4);  // make bottom shadows less harsh
 
@@ -80,20 +88,24 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     // Day
     //
     const light2 = new DirectionalLight("Dir0", new Vector3(-1, -1, 0.8), scene);
-    light2.intensity = 0.8;
-    light2.diffuse = new Color3(0.7, 0.8, 1.0);
+    light2.intensity = 1;
+    light2.diffuse = new Color3(1, 1, 0.9);
     light2.specular = new Color3(0, 0, 0);
+
+    // const shadowGenerator = new ShadowGenerator(2048, light2);
+    // shadowGenerator.useExponentialShadowMap = true;
+    // shadowGenerator.usePoissonSampling = true; 
+    // shadowGenerator.bias = 0.01;
 
     /* ********************************************************************* */
     /* SCENE OBJECTS */
     /* ********************************************************************* */
 
     // GRID GROUND (debug)
-    /*
-    const ground = Mesh.CreateGround("ground1", 1000, 1000, 1, scene);
-    ground.material = new GridMaterial("groundMaterial", scene);
-    ground.position.y = -0.1; // slightly below the y origin to avoid rendering artefacts due to coplanar meshes on y=0
-    */
+
+    // const ground = Mesh.CreateGround("ground1", 3000, 3000, 1, scene);
+    // ground.material = new GridMaterial("groundMaterial", scene);
+    // ground.position.y = -0.1; // slightly below the y origin to avoid rendering artefacts due to coplanar meshes on y=0
 
     // 3D CURSOR
     const cursor3D = new IsoCursorComponent();
@@ -140,25 +152,35 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
 
     /* Obstacles meshs + materials */
 
-    /* Rocks01 */
+    const AlienBonesComponent = BasicComponentBuilder();
+    AlienBonesComponent.setup(assets.meshes.get("alienbones"));
 
-    const Rock01Component = BasicComponentBuilder();
-    Rock01Component.setup(assets.meshes.get("rocksTallOre"));
+    const Rocks01Component = BasicComponentBuilder();
+    Rocks01Component.setup(assets.meshes.get("rocks01"));
 
-    const Rock02Component = BasicComponentBuilder();
-    Rock02Component.setup(assets.meshes.get("rock02"));
-
-    const Rock03Component = BasicComponentBuilder();
-    Rock03Component.setup(assets.meshes.get("rock03"));
+    const Rocks02Component = BasicComponentBuilder();
+    Rocks02Component.setup(assets.meshes.get("rocks02"));
 
     const Crater01Component = BasicComponentBuilder();
-    Crater01Component.setup(assets.meshes.get("crater"));
+    Crater01Component.setup(assets.meshes.get("crater01"));
+
+    const Crater02Component = BasicComponentBuilder();
+    Crater02Component.setup(assets.meshes.get("crater02"));
 
     // const Crater02Component = BasicComponentBuilder();
     // Crater02Component.setup(assets.meshes.get("crater02"));
 
     const Satellite01Component = BasicComponentBuilder();
     Satellite01Component.setup(assets.meshes.get("satellite01"));
+
+    const Satellite02Component = BasicComponentBuilder();
+    Satellite02Component.setup(assets.meshes.get("satellite02"));
+
+    const Station01Component = BasicComponentBuilder();
+    Station01Component.setup(assets.meshes.get("station01"));
+
+    const Station02Component = BasicComponentBuilder();
+    Station02Component.setup(assets.meshes.get("station02"));
 
     /* ********************************************************************* */
     /* MECANICS */
@@ -190,6 +212,12 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
             setISOView() { awcam.setISOView(); },
             zoomIn() { awcam.zoomIn(); },
             zoomOut() { awcam.zoomOut(); },
+            setProjection(projection) {
+                awcam.setIsometric(projection === "isometric");
+            },
+            setAltitude(altitude) {
+                awcam.setFar(altitude === "high");
+            },
             resize: function() {
                 awcam.onResize();
                 engine.resize();
@@ -220,13 +248,16 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     desertTexture.uScale = 7.0;
                     desertTexture.vScale = 7.0;
                     groundMaterial.diffuseTexture = desertTexture;
-                    groundMaterial.bumpTexture = desertTexture;
+                    //groundMaterial.bumpTexture = desertTexture;
+                    
                     //groundMaterial.emissiveTexture = desertTexture;
                     //groundMaterial.emissiveColor = Color3.Red();
                     //groundMaterial.useEmissiveAsIllumination = true;
 
                     groundmesh.material = groundMaterial;
                     groundmesh.material.freeze();
+
+                    //groundmesh.receiveShadows = true;
 
                     // Make a mesh shaper device.
                     var vertexData = new VertexData();
@@ -236,6 +267,13 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     
                     // Use the vertexData object.. to shape-ify blankmesh
                     vertexData.applyToMesh(groundmesh);
+
+
+                    // heightmap ground
+                    // const hmground = Mesh.CreateGroundFromHeightMap("ground", themeUrl + "/textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
+                    // //hmground.material = groundMaterial;
+                    // //hmground.convertToFlatShadedMesh();
+                    // hmground.position = new Vector3(500, 0, 500);
                 });
 
                 // Field objects setup
@@ -244,13 +282,45 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
 
                     let objectInstance : SceneComponent;
 
+                    let scale = null;
+
                     switch(object.type) {
-                        case "rock01": {
-                            objectInstance = new Rock01Component();
+                        case "rocks01": {
+                            objectInstance = new Rocks01Component();
+                            break;
+                        }
+                        case "rocks02": {
+                            objectInstance = new Rocks02Component();
+                            break;
+                        }
+                        case "alienBones": {
+                            objectInstance = new AlienBonesComponent();
+                            break;
+                        }
+                        case "satellite01": {
+                            objectInstance = new Satellite01Component();
+                            break;
+                        }
+                        case "satellite02": {
+                            objectInstance = new Satellite02Component();
+                            break;
+                        }
+                        case "station01": {
+                            objectInstance = new Station01Component();
+                            break;
+                        }
+                        case "station02": {
+                            objectInstance = new Station02Component();
                             break;
                         }
                         case "crater01": {
-                            objectInstance = new Satellite01Component();
+                            objectInstance = new Crater01Component();
+                            scale = new Vector3(object.diameter, object.diameter/2, object.diameter);
+                            break;
+                        }
+                        case "crater02": {
+                            objectInstance = new Crater02Component();
+                            scale = new Vector3(object.diameter, object.diameter/2, object.diameter);
                             break;
                         }
                         default: {
@@ -263,38 +333,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                         object.point[0],      // x (latéral)
                         object.point[1],      // z (profondeur)
                     );
-                    objectInstance.setScale(new Vector3(object.diameter, object.diameter, object.diameter));
-
-                    // var groundmesh = new Mesh("ground" + index, scene);
-                    // groundmesh.position = new Vector3(0, -0.001, 0);
-
-                    // const groundMaterial = new StandardMaterial("desert", scene);
-                    // const desertTexture = new Texture(
-                    //     "data:image(desert)",
-                    //     scene,
-                    //     true,
-                    //     true,
-                    //     Texture.TRILINEAR_SAMPLINGMODE,
-                    //     () => null,
-                    //     () => null,
-                    //     assets.images.get("desert")
-                    // );
-                    // desertTexture.uScale = 50.0;
-                    // desertTexture.vScale = 50.0;
-                    // groundMaterial.diffuseTexture = desertTexture;
-                    // groundMaterial.emissiveTexture = desertTexture;
-
-                    // groundmesh.material = groundMaterial;
-                    // groundmesh.material.freeze();
-
-                    // // Make a mesh shaper device.
-                    // var vertexData = new VertexData();
-                    // vertexData.positions = ground.mesh.vertices;
-                    // vertexData.indices = ground.mesh.indices;
-                    // vertexData.uvs = ground.mesh.uvs;
-                    
-                    // // Use the vertexData object.. to shape-ify blankmesh
-                    // vertexData.applyToMesh(groundmesh);
+                    objectInstance.setScale(scale ? scale : new Vector3(object.diameter, object.diameter, object.diameter));
+                    objectInstance.setOrientation(object.orientation);
+                    //shadowGenerator.getShadowMap().renderList.push(objectInstance.getInstancedMesh());
                 });
 
 
@@ -322,6 +363,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                         agent = new AgentComponent();
                         agent.init(scene);
                         agents.set(agentinfo.Id, agent);
+                        //agent.setScale(new Vector3(3, 3, 3));
                     } else {
                         agent = agents.get(agentinfo.Id);
                     }

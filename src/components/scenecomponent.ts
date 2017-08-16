@@ -1,4 +1,4 @@
-import { Scene, Vector3 } from "babylonjs";
+import { Scene, Vector3, InstancedMesh } from "babylonjs";
 
 export default interface SceneComponent {
     init(scene: Scene, options: any);
@@ -11,5 +11,6 @@ export default interface SceneComponent {
     setScale(scale: Vector3);
 
     getPosition() : Vector3;
+    getInstancedMesh() : InstancedMesh;
 }
 

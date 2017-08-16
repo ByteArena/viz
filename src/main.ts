@@ -52,6 +52,22 @@ export default async function main(canvas: HTMLCanvasElement, wsurl: string, tps
         handles.zoomOut();
     });
 
+
+
+    Array.prototype.forEach.call(document.querySelectorAll('input[type=radio][name="projection"]'), function(radio) {
+        radio.addEventListener('change', e => {
+            e.stopPropagation();
+            handles.setProjection(radio.value);
+        });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('input[type=radio][name="altitude"]'), function(radio) {
+        radio.addEventListener('change', e => {
+            e.stopPropagation();
+            handles.setAltitude(radio.value);
+        });
+    });
+
     // document.getElementById("zoomslider").addEventListener("input", e => {
     //     e.stopPropagation();
     //     handles.setZoom(e.target.value);
