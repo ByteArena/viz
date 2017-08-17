@@ -21,9 +21,9 @@ type Vizagentmessage = {
 }
 
 type Vizprojectilemessage = {
+	Id: string,
 	Position: Vec2Array,
-	Radius: number,
-	From: Vizagentmessage,
+	Velocity: Vec2Array,
 	Kind: string,
 }
 

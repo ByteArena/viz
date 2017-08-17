@@ -13,6 +13,13 @@ function agentInfoToProps(agentinfo: Vizagentmessage) {
     };
 }
 
+function projectileInfoToProps(projectileinfo: Vizprojectilemessage) {
+    return {
+        velocity: Vector2.fromArray(projectileinfo.Velocity),
+        position: Vector2.fromArray(projectileinfo.Position),
+    };
+}
+
 export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: number, sendFrame: (message: Object) => void) {
 
     const tickdurationms = 1000 / tps;
@@ -29,6 +36,10 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
 
     const thisframe = next3[0].getPayload();
     const nextframe = next3[1].getPayload();
+
+    //
+    // Agents
+    //
 
     const thisframeAgentsProps = thisframe.Agents.sort((a, b) => a.Id > b.Id ? 1 : -1).map((agentinfo: Vizagentmessage) => agentInfoToProps(agentinfo));
     const nextframeAgentsProps = nextframe.Agents.sort((a, b) => a.Id > b.Id ? 1 : -1).map((agentinfo: Vizagentmessage) => agentInfoToProps(agentinfo));
@@ -53,6 +64,25 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
         };
     });
 
+    //
+    // Projectiles
+    //
+
+    // TODO: fix 2 bugs here:
+    // * a projectile in thisframe might not exist in next frame (and vice versa)
+    // * the order of the projectile collection is not stable; should not base diff on index, but rather on id
+    const thisframeProjectilesProps = thisframe.Projectiles.sort((a, b) => a.Id > b.Id ? 1 : -1).map((projectileinfo: Vizprojectilemessage) => projectileInfoToProps(projectileinfo));
+    const nextframeProjectilesProps = nextframe.Projectiles.sort((a, b) => a.Id > b.Id ? 1 : -1).map((projectileinfo: Vizprojectilemessage) => projectileInfoToProps(projectileinfo));
+
+    const projectileDiffs = nextframeProjectilesProps.map((nextprops, index) => {
+        const thisprops = thisframeProjectilesProps[index];
+
+        return {
+            velocity: nextprops.velocity.clone().sub(thisprops.velocity),
+            position: nextprops.position.clone().sub(thisprops.position),
+        };
+    });
+
 
     const fpt = targetfps / tps;
     const nbSynthesizedFrames = fpt - 1;
@@ -67,7 +97,12 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
             ).toArray();
 
             interpolatedframe.Agents[agentindex].Orientation = thisframeAgentsProps[agentindex].orientation + (agentdiff.orientation * timeratio);
-            //console.log(agentdiff.orientation);
+        });
+
+        projectileDiffs.map((projectilediff, projectileindex) => {
+            interpolatedframe.Projectiles[projectileindex].Position = thisframeProjectilesProps[projectileindex].position.clone().add(
+                projectilediff.position.clone().mult(timeratio)
+            ).toArray();
         });
 
         sendFrame(interpolatedframe);

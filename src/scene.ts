@@ -8,6 +8,7 @@ import Projection from './projection';
 import AgentComponent from './components/agent';
 import SceneComponent from './components/scenecomponent';
 import BasicComponentBuilder from './components/BasicComponentBuilder';
+import BasicComponent from './components/BaseComponent';
 import IsoCursorComponent from './components/isocursor';
 
 import AwesomeCamera from './awesomecamera';
@@ -48,6 +49,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     assetsManager.addMeshTask("mesh:alienbones", "main", themeUrl + "/models/", "alienBones.babylon");
     assetsManager.addMeshTask("mesh:station01", "main", themeUrl + "/models/", "station01.babylon");
     assetsManager.addMeshTask("mesh:station02", "main", themeUrl + "/models/", "station02.babylon");
+    assetsManager.addMeshTask("mesh:projectile", "main", themeUrl + "/models/", "projectile.babylon");
     
     //assetsManager.addImageTask("image:desert", themeUrl + "/textures/sand-ripples-seamless-orange.jpg");
     assetsManager.addImageTask("image:desert", themeUrl + "/textures/seamless-clay.jpg");
@@ -148,8 +150,6 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
         shadowmesh
     );
 
-    const agents = new Map<string, AgentComponent>();
-
     /* Obstacles meshs + materials */
 
     const AlienBonesComponent = BasicComponentBuilder();
@@ -181,6 +181,13 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
 
     const Station02Component = BasicComponentBuilder();
     Station02Component.setup(assets.meshes.get("station02"));
+
+    const ProjectileComponent = BasicComponentBuilder();
+    ProjectileComponent.setup(assets.meshes.get("projectile"));
+
+
+    const agents = new Map<string, AgentComponent>();
+    const projectiles = new Map<string, BasicComponent>();
 
     /* ********************************************************************* */
     /* MECANICS */
@@ -356,6 +363,23 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                 //     newDebugPoint.style.top = projected.y + "px";
                 //     debugpoints.appendChild(newDebugPoint);
                 // });
+
+                if(vizmsg.Projectiles) {
+                    vizmsg.Projectiles.forEach(projectileinfo => {
+                        let projectile = null;
+                        if (!projectiles.has(projectileinfo.Id)) {
+                            projectile = new ProjectileComponent();
+                            projectile.init(scene);
+                            projectile.setScale(new Vector3(0.2, 0.2, 0.2));
+                            projectiles.set(projectileinfo.Id, projectile);
+                        } else {
+                            projectile = projectiles.get(projectileinfo.Id);
+                        }
+
+                        projectile.setPosition(projectileinfo.Position[0] * unitRatio, projectileinfo.Position[1] * unitRatio);
+                        //projectile.setOrientation(projectileinfo.Orientation);
+                    });
+                }
 
                 vizmsg.Agents.forEach(agentinfo => {
                     let agent = null;
