@@ -7,6 +7,7 @@ const epsilonsq = epsilon * epsilon;
 
 function agentInfoToProps(agentinfo: Vizagentmessage) {
     return {
+        id: agentinfo.Id,
         velocity: Vector2.fromArray(agentinfo.Velocity),
         position: Vector2.fromArray(agentinfo.Position),
         orientation: agentinfo.Orientation,
@@ -15,6 +16,7 @@ function agentInfoToProps(agentinfo: Vizagentmessage) {
 
 function projectileInfoToProps(projectileinfo: Vizprojectilemessage) {
     return {
+        id: projectileinfo.Id,
         velocity: Vector2.fromArray(projectileinfo.Velocity),
         position: Vector2.fromArray(projectileinfo.Position),
     };
@@ -41,14 +43,21 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
     // Agents
     //
 
-    const thisframeAgentsProps = thisframe.Agents.sort((a, b) => a.Id > b.Id ? 1 : -1).map((agentinfo: Vizagentmessage) => agentInfoToProps(agentinfo));
-    const nextframeAgentsProps = nextframe.Agents.sort((a, b) => a.Id > b.Id ? 1 : -1).map((agentinfo: Vizagentmessage) => agentInfoToProps(agentinfo));
+    const thisFrameAgentHash = {};
+    thisframe.Agents.map((agent, thisframeindex) => {
+        thisFrameAgentHash[agent.Id] = agentInfoToProps(agent);
+        thisFrameAgentHash[agent.Id].index = thisframeindex;
+    });
 
-    const agentDiffs = nextframeAgentsProps.map((nextprops, index) => {
-        const thisprops = thisframeAgentsProps[index];
+    const agentDiffs = nextframe.Agents
+    .map(agentInfoToProps)
+    .map(nextprops => {
+        if(!(nextprops.id in thisFrameAgentHash)) return;
+
+        const thisprops = thisFrameAgentHash[nextprops.id];
 
         let difforientation = nextprops.orientation - thisprops.orientation;
-
+        
         if(difforientation > Math.PI) {
             difforientation = difforientation - 2 * Math.PI;
         }
@@ -58,31 +67,42 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
         }
 
         return {
+            id: nextprops.id,
             velocity: nextprops.velocity.clone().sub(thisprops.velocity),
             position: nextprops.position.clone().sub(thisprops.position),
             orientation: difforientation,
         };
-    });
+    })
+    .filter(v => !!v);
 
     //
     // Projectiles
     //
 
-    // TODO: fix 2 bugs here:
-    // * a projectile in thisframe might not exist in next frame (and vice versa)
-    // * the order of the projectile collection is not stable; should not base diff on index, but rather on id
-    const thisframeProjectilesProps = thisframe.Projectiles.sort((a, b) => a.Id > b.Id ? 1 : -1).map((projectileinfo: Vizprojectilemessage) => projectileInfoToProps(projectileinfo));
-    const nextframeProjectilesProps = nextframe.Projectiles.sort((a, b) => a.Id > b.Id ? 1 : -1).map((projectileinfo: Vizprojectilemessage) => projectileInfoToProps(projectileinfo));
+    const thisFrameProjHash = {};
+    thisframe.Projectiles.map((proj, thisframeindex) => {
+        thisFrameProjHash[proj.Id] = projectileInfoToProps(proj);
+        thisFrameProjHash[proj.Id].index = thisframeindex;
+    });
 
-    const projectileDiffs = nextframeProjectilesProps.map((nextprops, index) => {
-        const thisprops = thisframeProjectilesProps[index];
+    const projectileDiffs = nextframe.Projectiles
+    .map(projectileInfoToProps)
+    .map(nextprops => {
+        if(!(nextprops.id in thisFrameProjHash)) return;
+
+        const thisprops = thisFrameProjHash[nextprops.id];
 
         return {
+            id: nextprops.id,
             velocity: nextprops.velocity.clone().sub(thisprops.velocity),
             position: nextprops.position.clone().sub(thisprops.position),
         };
-    });
-
+    })
+    .filter(v => !!v);
+    
+    //
+    // Synthesize frames
+    //
 
     const fpt = targetfps / tps;
     const nbSynthesizedFrames = fpt - 1;
@@ -91,16 +111,18 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
         const interpolatedframe = thisframe;
         const timeratio = framenum / fpt;
 
-        agentDiffs.map((agentdiff, agentindex) => {
-            interpolatedframe.Agents[agentindex].Position = thisframeAgentsProps[agentindex].position.clone().add(
+        agentDiffs.map(agentdiff => {
+            const index = thisFrameAgentHash[agentdiff.id].index;
+            interpolatedframe.Agents[index].Position = thisFrameAgentHash[agentdiff.id].position.clone().add(
                 agentdiff.position.clone().mult(timeratio)
             ).toArray();
 
-            interpolatedframe.Agents[agentindex].Orientation = thisframeAgentsProps[agentindex].orientation + (agentdiff.orientation * timeratio);
+            interpolatedframe.Agents[index].Orientation = thisFrameAgentHash[agentdiff.id].orientation + (agentdiff.orientation * timeratio);
         });
 
-        projectileDiffs.map((projectilediff, projectileindex) => {
-            interpolatedframe.Projectiles[projectileindex].Position = thisframeProjectilesProps[projectileindex].position.clone().add(
+        projectileDiffs.map(projectilediff => {
+            const index = thisFrameProjHash[projectilediff.id].index;
+            interpolatedframe.Projectiles[index].Position = thisFrameProjHash[projectilediff.id].position.clone().add(
                 projectilediff.position.clone().mult(timeratio)
             ).toArray();
         });

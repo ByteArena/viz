@@ -364,28 +364,54 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                 //     debugpoints.appendChild(newDebugPoint);
                 // });
 
+                const seenprojectiles = [];
+
                 if(vizmsg.Projectiles) {
                     vizmsg.Projectiles.forEach(projectileinfo => {
+                        seenprojectiles.push(projectileinfo.Id);
                         let projectile = null;
                         if (!projectiles.has(projectileinfo.Id)) {
                             projectile = new ProjectileComponent();
                             projectile.init(scene);
-                            projectile.setScale(new Vector3(0.2, 0.2, 0.2));
+                            projectile.setScale(new Vector3(0.3, 0.3, 0.3));
                             projectiles.set(projectileinfo.Id, projectile);
                         } else {
                             projectile = projectiles.get(projectileinfo.Id);
                         }
 
-                        projectile.setPosition(projectileinfo.Position[0] * unitRatio, projectileinfo.Position[1] * unitRatio);
+                        projectile.setPosition(
+                            projectileinfo.Position[0] * unitRatio,
+                            projectileinfo.Position[1] * unitRatio,
+                            1.2 // agent altitude
+                        );
                         //projectile.setOrientation(projectileinfo.Orientation);
                     });
                 }
 
+                let removeids = [];
+                projectiles.forEach((projectile, projectileid) => {
+                    if(seenprojectiles.indexOf(projectileid) >= 0) return;
+                    removeids.push(projectileid);
+                });
+
+                removeids.map(projid => {
+                    console.log("REMOVE projectile", projid);
+                    const projectile = projectiles.get(projid);
+                    projectile.destroy(scene);
+                    projectiles.delete(projid);
+                });
+
+
+
+
+                const seenagents = [];
+
                 vizmsg.Agents.forEach(agentinfo => {
+                    seenagents.push(agentinfo.Id);
                     let agent = null;
                     if (!agents.has(agentinfo.Id)) {
                         agent = new AgentComponent();
-                        agent.init(scene);
+                        agent.init(scene, agentinfo.Id);
                         agents.set(agentinfo.Id, agent);
                         //agent.setScale(new Vector3(3, 3, 3));
                     } else {
@@ -394,6 +420,19 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
 
                     agent.setPosition(agentinfo.Position[0] * unitRatio, agentinfo.Position[1] * unitRatio);
                     agent.setOrientation(agentinfo.Orientation);
+                });
+
+                removeids = [];
+                agents.forEach((agent, agentid) => {
+                    if(seenagents.indexOf(agentid) >= 0) return;
+                    removeids.push(agentid);
+                });
+
+                removeids.map(agentid => {
+                    console.log("REMOVE agent", agentid);
+                    const agent = agents.get(agentid);
+                    agent.destroy(scene);
+                    agents.delete(agentid);
                 });
             },
         }

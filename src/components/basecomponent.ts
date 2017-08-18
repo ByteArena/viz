@@ -9,17 +9,23 @@ export default abstract class BaseComponent implements SceneComponent {
 
     abstract init(scene: Scene, id: string) : Promise<this>;
 
-    destroy(scene: Scene) { }
+    destroy(scene: Scene) {
+        this.getInstancedMesh().dispose();
+    }
+
     update(scene: Scene, options: any) { }
 
-    setPosition(x: number, y: number) {
+    setPosition(x: number, y: number, height: number = null) {
         const { instance } = this;
         if(instance === null) return;
 
         instance.position.x = x;
         instance.position.z = y;
+        if(height !== null) {
+            instance.position.y = height;
+        }
 
-        instance.position = new Vector3(instance.position.x, 0, instance.position.z);
+        instance.position = new Vector3(instance.position.x, instance.position.y, instance.position.z);
     }
 
     setOrientation(orientation: number) {
