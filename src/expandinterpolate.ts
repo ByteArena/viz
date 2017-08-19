@@ -80,12 +80,12 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
     //
 
     const thisFrameProjHash = {};
-    thisframe.Projectiles.map((proj, thisframeindex) => {
+    (thisframe.Projectiles||[]).map((proj, thisframeindex) => {
         thisFrameProjHash[proj.Id] = projectileInfoToProps(proj);
         thisFrameProjHash[proj.Id].index = thisframeindex;
     });
 
-    const projectileDiffs = nextframe.Projectiles
+    const projectileDiffs = (nextframe.Projectiles||[])
     .map(projectileInfoToProps)
     .map(nextprops => {
         if(!(nextprops.id in thisFrameProjHash)) return;
