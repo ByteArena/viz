@@ -44,8 +44,10 @@ export default class AwesomeCamera {
         this.cam.maxZ = 10000;
 
         this.setIsometric(iso);
+        this.setTopView();
+        this.setFar(true);
+        this.zoom = AwesomeCamera.minZoom;
 
-        this.setISOView();
         this.update();
     }
     

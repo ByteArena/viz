@@ -1,4 +1,4 @@
-import { Engine, Scene, Mesh, FreeCamera } from 'babylonjs';
+import { Engine, Scene, Mesh, FreeCamera, GUI } from 'babylonjs';
 import { HemisphericLight, DirectionalLight, ShadowGenerator } from 'babylonjs';
 import { AssetsManager, VertexData, Vector3, Color3, Color4 } from 'babylonjs';
 import { StandardMaterial, Texture } from 'babylonjs';
@@ -60,7 +60,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     /* CAMERA */
     /* ********************************************************************* */
 
-    const awcam = new AwesomeCamera(scene, false);
+    const awcam = new AwesomeCamera(scene, true);
     const projection = new Projection(scene);
 
     /* ********************************************************************* */
@@ -203,6 +203,20 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
             awcam.follow(new Vector3(agentpos.x, 0, agentpos.z));
         }
     });
+
+    // GUI
+    const guiLayer = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+    // Adding image
+    var iconImage = new GUI.Image("logo_icon", "https://bytearena.com/assets/img/angrybot.png");
+    iconImage.width = "65px";
+    iconImage.height = "62px";
+    iconImage.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    iconImage.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    iconImage.stretch = GUI.Image.STRETCH_UNIFORM;
+    iconImage.left = "5px";
+    iconImage.top = "5px";
+    guiLayer.addControl(iconImage);
 
     /*********************************************************************** */
     /* Debug container                                                       */
@@ -401,6 +415,22 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     projectiles.delete(projid);
                 });
 
+                const createLabel = function(msg: string) {
+                    var label = new GUI.Rectangle(msg);
+                    label.height = "30px";
+                    label.alpha = 0.7;
+                    label.cornerRadius = 20;
+                    label.thickness = 0;
+                    label.linkOffsetY = -30;
+            
+                    var text1 = new GUI.TextBlock();
+                    text1.text = msg;
+                    text1.color = "white";
+                    text1.fontSize = 12;
+                    label.addControl(text1);
+
+                    return label;
+                }  
 
 
 
@@ -414,6 +444,10 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                         agent.init(scene, agentinfo.Id);
                         agents.set(agentinfo.Id, agent);
                         //agent.setScale(new Vector3(3, 3, 3));
+                
+                        const label = createLabel(agentinfo.Name);
+                        guiLayer.addControl(label);
+                        label.linkWithMesh(agent.getInstancedMesh());
                     } else {
                         agent = agents.get(agentinfo.Id);
                     }
