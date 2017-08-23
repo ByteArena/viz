@@ -208,7 +208,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     // GUI
     const guiLayer = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    // Adding image
+    // // Adding image
     var iconImage = new GUI.Image("logo_icon", "https://bytearena.com/assets/img/angrybot.png");
     iconImage.width = "65px";
     iconImage.height = "62px";
@@ -475,9 +475,10 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                         const label = createLabel(agentinfo.Name);
                         guiLayer.addControl(label);
                         label.linkWithMesh(agent.getInstancedMesh());
-                        // agent.onBeforeDestroy(function() {
-                        //     console.log(label);
-                        // });
+                        agent.onBeforeDestroy(function() {
+                            label.linkWithMesh(null);
+                            label.notRenderable = true;
+                        });
                     } else {
                         agent = agents.get(agentinfo.Id);
                     }
