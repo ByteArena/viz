@@ -440,7 +440,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                 const createLabel = function(msg: string) {
                     var label = new GUI.Rectangle(msg);
                     label.height = "30px";
-                    label.alpha = 0.7;
+                    label.alpha = 0.8;
                     label.cornerRadius = 20;
                     label.thickness = 0;
                     label.linkOffsetY = -30;
@@ -467,7 +467,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                         agents.set(agentinfo.Id, agent);
                         //agent.setScale(new Vector3(3, 3, 3));
                 
-                        const label = createLabel(agentinfo.Name);
+                        const label = createLabel(agentinfo.Name.replace(/^agent\//, ''));
                         guiLayer.addControl(label);
                         label.linkWithMesh(agent.getInstancedMesh());
                     } else {
