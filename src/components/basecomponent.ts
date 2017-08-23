@@ -6,10 +6,14 @@ import * as constants from '../constants';
 export default abstract class BaseComponent implements SceneComponent {
 
     protected instance: InstancedMesh = null;
+    protected onBeforeDestroyStack: Array<Function> = new Array<Function>();
 
     abstract init(scene: Scene, id: string) : Promise<this>;
 
     destroy(scene: Scene) {
+        this.onBeforeDestroyStack.forEach(cbk => {
+            cbk(this, scene);
+        });
         this.getInstancedMesh().dispose();
     }
 
@@ -45,5 +49,9 @@ export default abstract class BaseComponent implements SceneComponent {
     
     getInstancedMesh() : InstancedMesh {
         return this.instance;
+    }
+
+    onBeforeDestroy(cbk: Function) {
+        this.onBeforeDestroyStack.push(cbk);
     }
 }

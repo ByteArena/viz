@@ -223,6 +223,8 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     /* Debug container                                                       */
     /*********************************************************************** */
 
+    let isMapSet = false;
+
     return {
         scene,
         handles: {
@@ -249,6 +251,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                 scenestate.pickpos = pickResult.pickedPoint;    // pos or null
             },
             setMap: function(arenamap: any) {
+
+                if(isMapSet) return;
+                isMapSet = true;
 
                 // Grounds setup
                 arenamap.data.grounds.map((ground, index) => {
@@ -467,9 +472,12 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                         agents.set(agentinfo.Id, agent);
                         //agent.setScale(new Vector3(3, 3, 3));
                 
-                        const label = createLabel(agentinfo.Name.replace(/^agent\//, ''));
+                        const label = createLabel(agentinfo.Name);
                         guiLayer.addControl(label);
                         label.linkWithMesh(agent.getInstancedMesh());
+                        // agent.onBeforeDestroy(function() {
+                        //     console.log(label);
+                        // });
                     } else {
                         agent = agents.get(agentinfo.Id);
                     }

@@ -34,7 +34,11 @@ export default class Agent extends BaseComponent {
     }
 
     destroy(scene: Scene) {
-        super.destroy(scene);
+        try {
+            super.destroy(scene);
+        } catch(e) {
+            console.log("intercepted GUI error", e);
+        }
         this.shadowinstance.dispose();
     }
 

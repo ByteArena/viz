@@ -13,14 +13,14 @@ export default class AwesomeCamera {
     private zoom: number = AwesomeCamera.defaultZoom;
     private baseopening: number = 8;
     private sightdirection: Vector3;
-    private isometric: boolean = true;
+    private isometric: boolean = false;
     private far: boolean = true;
 
     private _curView = null;
 
     private static minZoom = -2;
     private static maxZoom = 10;
-    private static defaultZoom = 6;
+    private static defaultZoom = 3;
 
     private static origPosition: Vector3 = new Vector3(0, agentAltitude*4, 0);
     private static origPositionFar: Vector3 = new Vector3(0, 100, 0);
@@ -44,9 +44,9 @@ export default class AwesomeCamera {
         this.cam.maxZ = 10000;
 
         this.setIsometric(iso);
-        this.setTopView();
+        this.setISOView();
         this.setFar(true);
-        this.zoom = AwesomeCamera.minZoom;
+        this.zoom = AwesomeCamera.defaultZoom;
 
         this.update();
     }
