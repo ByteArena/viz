@@ -18,6 +18,7 @@ import './protocol/vizmessage'
 //import GridMaterial from './gridmaterial';
 
 const scenestate = { pickpos: null };
+const debug = false;
 
 export default async function createScene(engine: Engine, canvas: HTMLElement, assetsUrl: string) : Promise<any> {
 
@@ -359,6 +360,28 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     //shadowGenerator.getShadowMap().renderList.push(objectInstance.getInstancedMesh());
                 });
 
+                if(debug) {
+                    const collisionmaterial = new StandardMaterial("collmesh", scene);
+                    collisionmaterial.diffuseColor = new Color3(1, 0, 1);
+                    collisionmaterial.emissiveColor = collisionmaterial.diffuseColor;
+    
+                    arenamap.data.collisionmeshes.map((collisionmeshinfo, index) => {
+                        
+                        const collisionmesh = new Mesh("collisionmesh-" + collisionmeshinfo.id, scene);
+                        collisionmesh.position = new Vector3(0, 20, 0);
+                        collisionmesh.material = collisionmaterial;
+    
+                        const indices = Array.apply(null, {length: collisionmeshinfo.vertices.length/3}).map(Number.call, Number);
+    
+                        const vertexData = new VertexData();
+                        vertexData.positions = collisionmeshinfo.vertices;
+                        vertexData.indices = indices;
+                        vertexData.applyToMesh(collisionmesh);
+                    });
+    
+                    console.log("ARENAMAP", arenamap);
+                }
+
 
             },
             setVizMessage: function(vizmsg: Vizmessage) {
@@ -396,7 +419,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                         projectile.setPosition(
                             projectileinfo.Position[0] * unitRatio,
                             projectileinfo.Position[1] * unitRatio,
-                            1.2 // agent altitude
+                            debug ? 30.2 : 1.2 // debug altitude / agent altitude
                         );
                         //projectile.setOrientation(projectileinfo.Orientation);
                     });
@@ -409,7 +432,6 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                 });
 
                 removeids.map(projid => {
-                    console.log("REMOVE projectile", projid);
                     const projectile = projectiles.get(projid);
                     projectile.destroy(scene);
                     projectiles.delete(projid);
