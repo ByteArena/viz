@@ -64,7 +64,7 @@ export default function comm (websocketurl: string, tps: number, setMap: (map: a
         const next3 = bucket.next3();
         if(next3 !== undefined) {
             bucket.consumeOne();
-            expandAndInterpolateBatch(next3, tps, 60, onMessage);   // TODO: remove 60 (fps) and rely on rAF rate
+            expandAndInterpolateBatch(next3, tps, 60, onMessage);   // TODO(jerome): remove 60 (fps) and rely on rAF rate
         }
     }, 1000/tps);
 };

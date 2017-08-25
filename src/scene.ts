@@ -362,6 +362,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     );
                     objectInstance.setScale(scale ? scale : new Vector3(object.diameter, object.diameter, object.diameter));
                     objectInstance.setOrientation(object.orientation);
+                    objectInstance.getInstancedMesh().isVisible = !debug;
                     //shadowGenerator.getShadowMap().renderList.push(objectInstance.getInstancedMesh());
                 });
 
@@ -369,6 +370,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     const collisionmaterial = new StandardMaterial("collmesh", scene);
                     collisionmaterial.diffuseColor = new Color3(1, 0, 1);
                     collisionmaterial.emissiveColor = collisionmaterial.diffuseColor;
+                    collisionmaterial.alpha = 0.3;
     
                     arenamap.data.collisionmeshes.map((collisionmeshinfo, index) => {
                         

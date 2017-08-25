@@ -134,9 +134,5 @@ export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: n
         }
     };
 
-    //sendFrame(thisframe);
     window.requestAnimationFrame(synthesizeFrame.bind(null, 0));
-
-    // TODO: achieve 3 points interpolation
-
 };
