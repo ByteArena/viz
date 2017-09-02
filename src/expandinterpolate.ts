@@ -24,8 +24,7 @@ function projectileInfoToProps(projectileinfo: Vizprojectilemessage) {
 
 export default function (next3: [Frame, Frame, Frame], tps: number, targetfps: number, sendFrame: (message: Object) => void) {
 
-    const tickdurationms = 1000 / tps;
-    const framedurationms = 1000 / targetfps;
+    //targetfps = tps;
 
     ///////////////////////////////////////////////////////////////////////////
     // 2 points interpolation

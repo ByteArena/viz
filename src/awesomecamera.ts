@@ -33,7 +33,7 @@ export default class AwesomeCamera {
     private static viewFrontFar: Vector3 = new Vector3(0, agentAltitude, 100);
     private static viewISOFar: Vector3 = new Vector3(100, agentAltitude, 100);
 
-    constructor(scene: Scene, iso: boolean = true) {
+    constructor(scene: Scene, iso: boolean = false) {
         this.cam = new FreeCamera(
             "awcam",
             AwesomeCamera.origPosition,

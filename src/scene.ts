@@ -61,7 +61,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
     /* CAMERA */
     /* ********************************************************************* */
 
-    const awcam = new AwesomeCamera(scene, true);
+    const awcam = new AwesomeCamera(scene, false);
     const projection = new Projection(scene);
 
     /* ********************************************************************* */
@@ -487,6 +487,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
 
                     agent.setPosition(agentinfo.Position[0] * unitRatio, agentinfo.Position[1] * unitRatio);
                     agent.setOrientation(agentinfo.Orientation);
+                    if(agentinfo.DebugMsg !== "") {
+                        console.log(agentinfo.DebugMsg);
+                    }
                 });
 
                 removeids = [];
