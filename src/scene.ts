@@ -395,46 +395,49 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
 
                 const unitRatio = 1.0;
 
-                // const debugpoints = document.getElementById("debugpoints");
-                // while(debugpoints.firstChild) {
-                //     debugpoints.removeChild(debugpoints.firstChild);
-                // }
+                const seenobjects = [];
 
-                // vizmsg.DebugPoints.concat(vizmsg.DebugIntersects).forEach((debugpoint, index) => {
-                //     const projected = projection.project3DToScreenSpace(new Vector3(debugpoint[0] * unitRatio, 0, debugpoint[1] * unitRatio));
-                //     const newDebugPoint: HTMLDivElement = document.createElement("div");
-                //     newDebugPoint.style.left = projected.x + "px";
-                //     newDebugPoint.style.top = projected.y + "px";
-                //     debugpoints.appendChild(newDebugPoint);
-                // });
+                vizmsg.Objects.forEach(objectinfo => {
+                    seenobjects.push(objectinfo.Id);
+                    let object = null;
 
-                const seenprojectiles = [];
+                    switch(objectinfo.Type) {
+                        case "agent": {
+                            if (!agents.has(objectinfo.Id)) {
+                                object = new AgentComponent();
+                                object.init(scene, objectinfo.Id);
+                                agents.set(objectinfo.Id, object);
+                            } else {
+                                object = agents.get(objectinfo.Id);   
+                            }
 
-                if(vizmsg.Projectiles) {
-                    vizmsg.Projectiles.forEach(projectileinfo => {
-                        seenprojectiles.push(projectileinfo.Id);
-                        let projectile = null;
-                        if (!projectiles.has(projectileinfo.Id)) {
-                            projectile = new ProjectileComponent();
-                            projectile.init(scene);
-                            projectile.setScale(new Vector3(0.3, 0.3, 0.3));
-                            projectiles.set(projectileinfo.Id, projectile);
-                        } else {
-                            projectile = projectiles.get(projectileinfo.Id);
+                            object.setPosition(objectinfo.Position[0] * unitRatio, objectinfo.Position[1] * unitRatio);
+                            object.setOrientation(objectinfo.Orientation);
+                            break;
                         }
-
-                        projectile.setPosition(
-                            projectileinfo.Position[0] * unitRatio,
-                            projectileinfo.Position[1] * unitRatio,
-                            debug ? 30.2 : 1.2 // debug altitude / agent altitude
-                        );
-                        //projectile.setOrientation(projectileinfo.Orientation);
-                    });
-                }
+                        case "projectile": {
+                            if (!projectiles.has(objectinfo.Id)) {
+                                object = new ProjectileComponent();
+                                object.init(scene);
+                                object.setScale(new Vector3(0.3, 0.3, 0.3));
+                                projectiles.set(objectinfo.Id, object);
+                            } else {
+                                object = projectiles.get(objectinfo.Id);
+                            }
+    
+                            object.setPosition(
+                                objectinfo.Position[0] * unitRatio,
+                                objectinfo.Position[1] * unitRatio,
+                                debug ? 30.2 : 1.2 // debug altitude / agent altitude
+                            );
+                            break;
+                        }
+                    }
+                });
 
                 let removeids = [];
                 projectiles.forEach((projectile, projectileid) => {
-                    if(seenprojectiles.indexOf(projectileid) >= 0) return;
+                    if(seenobjects.indexOf(projectileid) >= 0) return;
                     removeids.push(projectileid);
                 });
 
@@ -444,57 +447,9 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     projectiles.delete(projid);
                 });
 
-                const createLabel = function(msg: string) {
-                    var label = new GUI.Rectangle(msg);
-                    label.height = "30px";
-                    label.alpha = 0.8;
-                    label.cornerRadius = 20;
-                    label.thickness = 0;
-                    label.linkOffsetY = -30;
-            
-                    var text1 = new GUI.TextBlock();
-                    text1.text = msg;
-                    text1.color = "white";
-                    text1.fontSize = 12;
-                    label.addControl(text1);
-
-                    return label;
-                }  
-
-
-
-                const seenagents = [];
-
-                vizmsg.Agents.forEach(agentinfo => {
-                    seenagents.push(agentinfo.Id);
-                    let agent = null;
-                    if (!agents.has(agentinfo.Id)) {
-                        agent = new AgentComponent();
-                        agent.init(scene, agentinfo.Id);
-                        agents.set(agentinfo.Id, agent);
-                        //agent.setScale(new Vector3(3, 3, 3));
-                
-                        const label = createLabel(agentinfo.Name);
-                        guiLayer.addControl(label);
-                        label.linkWithMesh(agent.getInstancedMesh());
-                        agent.onBeforeDestroy(function() {
-                            label.linkWithMesh(null);
-                            label.notRenderable = true;
-                        });
-                    } else {
-                        agent = agents.get(agentinfo.Id);
-                    }
-
-                    agent.setPosition(agentinfo.Position[0] * unitRatio, agentinfo.Position[1] * unitRatio);
-                    agent.setOrientation(agentinfo.Orientation);
-                    if(agentinfo.DebugMsg !== "") {
-                        console.log(agentinfo.DebugMsg);
-                    }
-                });
-
                 removeids = [];
                 agents.forEach((agent, agentid) => {
-                    if(seenagents.indexOf(agentid) >= 0) return;
+                    if(seenobjects.indexOf(agentid) >= 0) return;
                     removeids.push(agentid);
                 });
 

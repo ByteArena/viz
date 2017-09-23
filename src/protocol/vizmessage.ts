@@ -1,33 +1,20 @@
 type Vizmessage = {
-	Agents:                  Vizagentmessage[],
-	Projectiles:             Vizprojectilemessage[],
-	Obstacles:               Vizobstaclemessage[],
-	DebugIntersects:         Vec2Array,
-	DebugIntersectsRejected: Vec2Array,
-	DebugPoints:             Vec2Array[],
+	Objects:   VizObjectMessage[],
+	Obstacles: VizObstacleMessage[],
 }
 
 type Vec2Array = [number, number];
 
-type Vizagentmessage = {
+type VizObjectMessage = {
 	Id: string,
+	Type: string,
 	Position: Vec2Array,
 	Velocity: Vec2Array,
-	VisionRadius: number,
-	VisionAngle: number,
 	Radius: number,
-	Kind: string,
 	Orientation: number,
 }
 
-type Vizprojectilemessage = {
-	Id: string,
-	Position: Vec2Array,
-	Velocity: Vec2Array,
-	Kind: string,
-}
-
-type Vizobstaclemessage = {
+type VizObstacleMessage = {
 	Id: string,
 	A: Vec2Array,
 	B: Vec2Array,
