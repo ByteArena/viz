@@ -18,7 +18,18 @@ import './protocol/vizmessage'
 //import GridMaterial from './gridmaterial';
 
 const scenestate = { pickpos: null };
-const debug = false;
+
+function getParameterByName(name, url = null) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+const debug = getParameterByName("debug") !== null ? true : false;
 
 export default async function createScene(engine: Engine, canvas: HTMLElement, assetsUrl: string) : Promise<any> {
 
@@ -189,6 +200,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
 
     const agents = new Map<string, AgentComponent>();
     const projectiles = new Map<string, BasicComponent>();
+    let debugpoints = new Array<BasicComponent>();
 
     /* ********************************************************************* */
     /* MECANICS */
@@ -375,7 +387,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     arenamap.data.collisionmeshes.map((collisionmeshinfo, index) => {
                         
                         const collisionmesh = new Mesh("collisionmesh-" + collisionmeshinfo.id, scene);
-                        collisionmesh.position = new Vector3(0, 20, 0);
+                        collisionmesh.position = new Vector3(0, 1.2, 0);
                         collisionmesh.material = collisionmaterial;
     
                         const indices = Array.apply(null, {length: collisionmeshinfo.vertices.length/3}).map(Number.call, Number);
@@ -428,7 +440,7 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                             object.setPosition(
                                 objectinfo.Position[0] * unitRatio,
                                 objectinfo.Position[1] * unitRatio,
-                                debug ? 30.2 : 1.2 // debug altitude / agent altitude
+                                1.2,
                             );
                             break;
                         }
@@ -459,6 +471,26 @@ export default async function createScene(engine: Engine, canvas: HTMLElement, a
                     agent.destroy(scene);
                     agents.delete(agentid);
                 });
+
+                if(debug) {
+                    debugpoints.forEach(debugpoint => {
+                        debugpoint.destroy(scene);
+                    }); 
+    
+                    debugpoints = new Array<BasicComponent>();
+    
+                    vizmsg.DebugPoints.map(coords => {
+                        const obj = new ProjectileComponent();
+                        obj.init(scene, "id");
+                        obj.setScale(new Vector3(0.2, 0.2, 0.2));
+                        debugpoints.push(obj);
+                        obj.setPosition(
+                            coords[0] * unitRatio,
+                            coords[1] * unitRatio,
+                            1.2,
+                        );
+                    });
+                }
             },
         }
     };

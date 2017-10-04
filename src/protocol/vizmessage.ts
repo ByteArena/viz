@@ -1,6 +1,7 @@
 type Vizmessage = {
 	Objects:   VizObjectMessage[],
 	Obstacles: VizObstacleMessage[],
+	DebugPoints: Vec2Array[],
 }
 
 type Vec2Array = [number, number];
