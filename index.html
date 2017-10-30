@@ -1,113 +1,44 @@
 <!DOCTYPE html>
-
 <head>
-<meta charset="utf-8">
+<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no' />
+<meta charset='utf-8'>
+<link rel="stylesheet" type="text/css" href="/map/assets/css/styles.css">
+<link rel="manifest" href="/map/assets/json/manifest.json">
+<style></style>
+<title>Byte Arena - Scabb Island</title>
 <link rel="icon" href="https://bytearena.com/favicon.ico" />
 <link rel="icon" type="image/png" sizes="16x16" href="https://bytearena.com/favicon-16x16.png">
-<style>
-    html,
-    body {
-        overflow: hidden;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        background: silver;
-    }
-
-    #renderCanvas {
-        width: 100%;
-        height: 100%;
-        touch-action: none;
-    }
-
-    #controls {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        padding: 5px;
-        border-top-right-radius: 10px;
-        background-color: #777;
-        color: white;
-        font-family: sans-serif;
-        font-size: 10px;
-    }
-
-    #debugpoints div, #screenspacepoint {
-        position: absolute;
-        display: block;
-        width: 6px;
-        height: 6px;
-        border-radius: 100%;
-        background-color: red;
-        margin-left: -3px;
-        margin-top: -3px;
-        z-index: 100;
-    }
-
-    #screenspacepoint {
-        width: 10px;
-        height: 10px;
-        background-color: orange;
-        margin-left: -5px;
-        margin-top: -5px;
-    }
-
-    #arenaname {
-        position: absolute;
-    }
-
-</style>
-
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','https://www.google-analytics.com/analytics.js','ga'); ga('create', 'UA-105218918-1', 'auto'); ga('send', 'pageview');
-  </script>
+<script src="/map/assets/js/playcanvas-stable.min.js"></script>
+<script>
+    ASSET_PREFIX = "/map/";
+    SCRIPT_PREFIX = "/map/";
+    SCENE_PATH = "/map/assets/json/scene.json";
+    CONTEXT_OPTIONS = {
+        'antialias': true,
+        'alpha': false,
+        'preserveDrawingBuffer': false,
+        'preferWebGl2': true
+    };
+    //SCRIPTS = [ 9421721 ];
+    CONFIG_FILENAME = "/map/assets/json/config.json";
+    pc.script.legacy = false;
+</script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','https://www.google-analytics.com/analytics.js','ga'); ga('create', 'UA-105218918-1', 'auto'); ga('send', 'pageview');
+</script>
 </head>
 
 <body>
-<canvas id="renderCanvas"></canvas>
-<div id="controls">
-    <button id="debug">debug</button>
-    <button id="topview">Top</button>
-    <button id="frontview">Front</button>
-    <button id="isoview">Strategic</button>
-    &nbsp;|&nbsp;
-    <label><input type="radio" name="projection" value="standard" checked="checked">Standard</label>
-    <label><input type="radio" name="projection" value="isometric">Isometric</label>
-    &nbsp;|&nbsp;
-    <label><input type="radio" name="altitude" value="high" checked="checked">High altitude</label>
-    <label><input type="radio" name="altitude" value="low">Low altitude</label>
-    &nbsp;|&nbsp;
-    <button id="zoomout">Zoom -</button>
-    <button id="zoomin">Zoom +</button>
-
-</div>
-
-<div id="screenspacepoint"></div>
-<div id="debugpoints"></div>
-
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
-    crossorigin="anonymous"></script>
-<script src="https://preview.babylonjs.com/babylon.js"></script>
-<script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
-<!--script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/v3.0.7/dist/preview%20release/gui/babylon.gui.min.js"></script-->
-<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.gridMaterial.min.js"></script>
-<script src="https://cdn.rawgit.com/BabylonJS/Babylon.js/master/dist/materialsLibrary/babylon.skyMaterial.min.js"></script>
-<script src="/lib/bytearenaviz.min.js?{{.Rand}}"></script>
 <script>
-
-    window.BABYLON.Tools.GetClassName = function(e) { return ''; };
-
-    (function () {
-        window.ByteArena.startViz(
-            document.getElementById('renderCanvas'),
-            "{{.WsURL}}",
-            "{{.Tps}}",
-            "{{.CDNBaseURL}}"
-        );
-    })();
-
+    window.BAVizSettings = {
+        wsurl: "{{.WsURL}}",
+        tps: "{{.Tps}}",
+        cdnbaseurl: "{{.CDNBaseURL}}",
+    };
 </script>
+<script src="/lib/bytearenaviz.min.js?{{.Rand}}"></script>
+<script src="/map/assets/js/start.js"></script>
+<script src="/map/assets/js/loading.js"></script>
 </body>
 </html>
 
