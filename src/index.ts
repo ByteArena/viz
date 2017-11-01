@@ -2,8 +2,10 @@ import main from './main';
 
 interface Window { ByteArena: any; }
 
-(<any>window).BAHookAppCreated = function(app) {
+let pcapp;
 
+(<any>window).BAHookAppCreated = function(app) {
+    pcapp = app;
 };
 
 (<any>window).BAHookAppConfigured = function(app) {
@@ -27,5 +29,5 @@ interface Window { ByteArena: any; }
     // raf();
 
     const settings = (<any>window).BAVizSettings;
-    main((<any>window).pc.app, settings.wsurl, settings.tps, settings.cdnbaseurl);
+    main(pcapp, settings.wsurl, settings.tps, settings.cdnbaseurl);
 };

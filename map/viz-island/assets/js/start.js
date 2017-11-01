@@ -115,14 +115,14 @@
         return;
     }
 
-    if(window.BAHookCreateApp) window.BAHookCreateApp(app);
+    if(window.BAHookAppCreated) window.BAHookAppCreated(app);
 
     app.configure(CONFIG_FILENAME, function (err) {
         if (err) {
             console.error(err);
         }
 
-        if(window.BAHookConfigureApp) window.BAHookConfigureApp(app);
+        if(window.BAHookAppConfigured) window.BAHookAppConfigured(app);
 
         configureCss(app._fillMode, app._width, app._height);
         reflow();
@@ -140,7 +140,7 @@
                     console.error(err);
                 }
 
-                if(window.BAHookLoadScene) window.BAHookLoadScene(scene);
+                if(window.BAHookSceneLoaded) window.BAHookSceneLoaded(scene);
 
                 app.start();
             });
