@@ -1,9 +1,6 @@
-# bytearena-viz
-Byte Arena experimental 3D isometric Viz
+# viz
 
-```bash
-$ npm i && npm run dev
-```
+> Visualization for Byte Arena
 
 ## Shortcuts
 
