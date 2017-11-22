@@ -54,7 +54,14 @@ class Provider extends Component<any, State> {
     componentDidMount() {
         const onAppCreated = app => this.setState({ app });
 
-        const onAppConfigured = () => {};
+        const onAppConfigured = app => {
+            const width = window.document
+                .getElementById("application-canvas")
+                .getBoundingClientRect().width;
+
+            const height = window.innerHeight;
+            app.setCanvasFillMode(pc.FILLMODE_NONE, width, height);
+        };
 
         const onSceneLoaded = (/*scene*/) => {
             const { app } = this.state;
@@ -74,14 +81,13 @@ class Provider extends Component<any, State> {
                 settings.wsurl,
                 settings.tps,
                 game.onFrame.bind(game),
-                function (type: string, data: any) {
+                function(type: string, data: any) {
                     subscriptions[type](data);
                 },
             );
         };
 
         if (hasPlaycanvas) {
-
             window._startpc(
                 canvasRef,
                 onAppCreated,
@@ -89,22 +95,14 @@ class Provider extends Component<any, State> {
                 onSceneLoaded,
             );
         } else {
-
             console.warn("PlayCanvas has not been detected");
         }
     }
 
     render() {
-        const children = React.cloneElement(
-            this.props.children,
-            { canvasRef },
-        );
+        const children = React.cloneElement(this.props.children, { canvasRef });
 
-        return (
-            <div>
-                {children}
-            </div>
-        );
+        return <div>{children}</div>;
     }
 }
 

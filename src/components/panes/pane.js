@@ -28,53 +28,47 @@ type Props = {
 
 type Context = {
     game: Game,
-}
+};
 
 function Element({ children }: any) {
-    return (
-        <div className={elementClassName}>
-            {children}
-        </div>
-    );
+    return <div className={elementClassName}>{children}</div>;
 }
 
-export function Pane({ canvasRef, className, children, size }: Props, { game }: Context) {
+export function Pane(
+    { canvasRef, className, children, size }: Props,
+    { game }: Context,
+) {
     const elements = React.Children.map(children, item => (
-        <Element>
-            {item}
-        </Element>
+        <Element>{item}</Element>
     ));
 
     function inject(node) {
-        (node) && node.appendChild(canvasRef);
+        node && node.appendChild(canvasRef);
     }
 
     function onDragFinished() {
-        const {width} = canvasRef.getBoundingClientRect();
+        const { width } = canvasRef.getBoundingClientRect();
 
-        (game) && game.getApp().setCanvasFillMode(
-            pc.FILLMODE_NONE,
-            width,
-            window.innerHeight,
-        );
+        game &&
+            game
+                .getApp()
+                .setCanvasFillMode(pc.FILLMODE_NONE, width, window.innerHeight);
     }
 
     return (
         <SplitPane
-            onDragFinished={onDragFinished}
             defaultSize={100 - size + "%"}
+            onDragFinished={onDragFinished}
             resizerStyle={resizerStyle}
             split="vertical"
         >
             <div ref={inject} />
 
-            <div className={className}>
-                {elements}
-            </div>
+            <div className={className}>{elements}</div>
         </SplitPane>
     );
 }
 
 Pane.contextTypes = {
     game: PropTypes.object,
-}
+};
