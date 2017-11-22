@@ -18,15 +18,23 @@ export default class Game {
   agentEntities: Object;
   projectileEntities: Object;
 
-  projectileMaterial: any;
+  agentMaterial: any;
 
   zoom: number;
 
+  debug: boolean;
+  agentaltitude: number;
+
   constructor(app: Object) {
     this.app = app;
+    this.debug = false;
+    this.agentaltitude = 0.04;
   }
 
   init() {
+
+    this.debug = document.location.href.split('debug=').length > 1;
+
     this.setCamera("default");
     this.setZoom(50);
 
@@ -36,15 +44,17 @@ export default class Game {
     // this.debugPointDrawer = new DebugPointsHelper(0.8);
     // this.debugPointDrawer.init();
 
-    // this.debugSegmentsDrawer = new DebugSegmentsHelper(0.8);
-    // this.debugSegmentsDrawer.init();
+    if(this.debug) 
+        this.debugSegmentsDrawer = new DebugSegmentsHelper(0.8);
+        this.debugSegmentsDrawer.init();
+    }
 
     this.agentEntities = {};
     this.projectileEntities = {};
 
-    this.projectileMaterial = new pc.PhongMaterial();
-    this.projectileMaterial.diffuse.set(1, 0.0, 0.0);
-    this.projectileMaterial.update();
+    this.agentMaterial = new pc.PhongMaterial();
+    this.agentMaterial.diffuse.set(1, 0.0, 0.0);
+    this.agentMaterial.update();
   }
 
   update() {
@@ -58,7 +68,9 @@ export default class Game {
 
   onFrame(frame: Vizmessage) {
     // this.debugPointDrawer.update(this.app, frame.DebugPoints);
-    // this.debugSegmentsDrawer.update(this.app, frame.DebugSegments);
+    if(this.debug) {
+        this.debugSegmentsDrawer.update(this.app, frame.DebugSegments);
+    }
 
     const seenObjectIds = {};
 
@@ -77,6 +89,7 @@ export default class Game {
           agent.castShadows = true;
           this.app.root.addChild(agent);
           this.agentEntities[msg.Id] = agent;
+          //agent.model.model.meshInstances[0].material = this.agentMaterial;
         } else {
           agent = this.agentEntities[msg.Id];
         }
@@ -92,14 +105,12 @@ export default class Game {
           projectile.addComponent("model", {
             type: "box"
           });
-          projectile.setLocalScale(0.005, 0.005, 0.005);
+          projectile.setLocalScale(0.01, 0.01, 0.01);
           projectile.isStatic = false;
           projectile.castShadowsLightmap = false;
           projectile.castShadows = true;
           this.app.root.addChild(projectile);
           this.projectileEntities[msg.Id] = projectile;
-
-          projectile.model.model.meshInstances[0].material = this.projectileMaterial;
         } else {
           projectile = this.projectileEntities[msg.Id];
         }
@@ -163,7 +174,7 @@ export default class Game {
 
   _placeAgent(agent: any, info: VizObjectMessage) {
     const pos = info.Position;
-    agent.setPosition(pos[0], 0.02, pos[1]);
+    agent.setPosition(pos[0], this.agentaltitude, pos[1]);
 
     const orientation = info.Orientation;
     const orientationDegrees = orientation * (360 / (2 * Math.PI));
@@ -172,6 +183,6 @@ export default class Game {
 
   _placeProjectile(projectile: any, info: VizObjectMessage) {
     const pos = info.Position;
-    projectile.setPosition(pos[0], 0.02, pos[1]);
+    projectile.setPosition(pos[0], this.agentaltitude, pos[1]);
   }
 }
