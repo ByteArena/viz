@@ -18,6 +18,10 @@ export function agents(
                     name: action.name,
                 },
             ]
+
+        case "CLEAR":
+            return initialState;
+
         default:
             return state
     }

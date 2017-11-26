@@ -9,8 +9,9 @@ import { connect, Provider as ReduxProvider } from 'react-redux'
 import comm from "./internal/comm";
 import reducer from "./reducers"
 import Game from "./game/game";
-import { App } from "./app";
+import App from "./app";
 import actions from "./actions";
+import { registrerEvents } from "./events"
 
 const hasPlaycanvas = typeof window._startpc !== "undefined";
 const canvasRef = document.createElement("div");
@@ -73,6 +74,8 @@ class Provider extends Component<any, State> {
                             break;
                         }
                         case "init": {
+                            this.props.dispatch(actions.agent.clear())
+
                             data.agents.forEach(agent => {
                                 this.props.dispatch(actions.agent.addAgent(agent.AgentName, agent.Id))
                             })
@@ -120,3 +123,5 @@ ReactDOM.render(
     </ReduxProvider>,
     document.getElementById("root"), // eslint-disable-line flowtype-errors/show-errors
 );
+
+registrerEvents(store);

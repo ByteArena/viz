@@ -3,12 +3,13 @@
 import React from "react";
 import { css } from "emotion";
 import PropTypes from "prop-types";
+import { connect } from "react-redux"
 
 import { Pane } from "./components/panes/pane";
-import { ZoomSlider } from "./components/zoom-slider";
-import { CameraSelect } from "./components/camera-select";
+import CameraSelect from "./containers/camera-select";
 import AgentList from "./containers/agent-list";
 import StatusIndicator from "./containers/status-indicator";
+import ZoomSlider from "./containers/zoom-slider";
 
 const rightPaneClass = css`
     height: 100%;
@@ -18,23 +19,25 @@ const rightPaneClass = css`
 
 type Props = {
     canvasRef: Object,
+
+    settings: {
+        zoom: number,
+        camera: string,
+    },
 };
 
 type Context = {
     game: ?Game,
 };
 
-export function App({ canvasRef }: Props, { game }: Context) {
-    function onZoomChange(value) {
-        if (game != null) {
-            game.setZoom(value);
-        }
+function App({ canvasRef, settings }: Props, { game }: Context) {
+
+    if (game != null) {
+        game.setZoom(settings.zoom);
     }
 
-    function onCameraSelect(value) {
-        if (game != null) {
-            game.setCamera(value);
-        }
+    if (game != null) {
+        game.setCamera(settings.camera);
     }
 
     return (
@@ -44,8 +47,8 @@ export function App({ canvasRef }: Props, { game }: Context) {
                 size={20}
                 canvasRef={canvasRef}
             >
-                <ZoomSlider onChange={onZoomChange} />
-                <CameraSelect onChange={onCameraSelect} />
+                <ZoomSlider />
+                <CameraSelect />
                 <StatusIndicator />
                 <AgentList />
             </Pane>
@@ -56,3 +59,12 @@ export function App({ canvasRef }: Props, { game }: Context) {
 App.contextTypes = {
     game: PropTypes.object,
 };
+
+const mapStateToProps = (state) => ({
+    settings: state.settings,
+});
+
+export default connect(
+    mapStateToProps,
+)(App)
+

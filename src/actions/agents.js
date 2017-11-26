@@ -7,3 +7,7 @@ export function addAgent(name: string, id: string) {
         id,
     }
 }
+
+export function clear() {
+    return { type: "CLEAR" };
+}
