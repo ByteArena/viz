@@ -37,4 +37,8 @@ export default class RemoteFollowCamera implements Camera {
     update(followpos: Point3) {
         this._camera.lookAt(followpos);
     }
+
+    worldToScreen(pos: pc.Vec3): pc.Vec3 {
+        return this._camera.camera.worldToScreen(pos);
+    }
 }

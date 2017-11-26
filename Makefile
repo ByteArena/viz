@@ -1,6 +1,9 @@
 export PATH := $(PATH):./node_modules/.bin/
 
-WEBPACK_BUILD_OPTS = -p
+WEBPACK_BUILD_OPTS_PROD = -p
+WEBPACK_BUILD_OPTS_DEV =
+
+WEBPACK_BUILD_OPTS = $(WEBPACK_BUILD_OPTS_DEV)
 
 build:
 	./node_modules/.bin/webpack $(WEBPACK_BUILD_OPTS)

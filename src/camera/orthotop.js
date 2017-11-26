@@ -32,4 +32,8 @@ export default class OrthoTopCamera implements Camera {
     update(followpos: Point3) {
         this._camera.setPosition(followpos.x, 3, followpos.z);
     }
+
+    worldToScreen(pos: pc.Vec3): pc.Vec3 {
+        return this._camera.camera.worldToScreen(pos);
+    }
 }

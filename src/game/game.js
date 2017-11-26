@@ -7,6 +7,8 @@ import actions from "../actions";
 import DrawGridHelper from "../helper/drawGrid";
 //import DebugPointsHelper from "../helper/debugPoints";
 import DebugSegmentsHelper from "../helper/debugSegments";
+import BaseUI from '../helper/baseUI';
+import AgentUI from '../helper/agentUI';
 
 export default class Game {
     app: Object;
@@ -48,6 +50,12 @@ export default class Game {
             this.gridDrawer.init();
         }
 
+        // $FlowFixMe
+        this.baseui = new BaseUI({ game: this });
+        this.baseui.init();
+        this.agentui = new AgentUI({ baseui: this.baseui });
+        this.agentui.init();
+
         this.agentEntities = {};
         this.projectileEntities = {};
 
@@ -57,15 +65,20 @@ export default class Game {
     }
 
     update() {
+
         if (this.debug) {
             this.gridDrawer.update(this.app);
         }
 
-        const agent =
+        this.baseui.update();
+        this.agentui.update(this.agentEntities);
+
+        const followedAgent =
             Object.keys(this.agentEntities).length > 0
                 ? this.agentEntities[Object.keys(this.agentEntities)[0]]
                 : null;
-        agent && this.camera.update(agent.getLocalPosition());
+
+        followedAgent && this.getCamera().update(followedAgent.getLocalPosition());
     }
 
     onFrame(frame: Vizmessage) {
@@ -170,6 +183,10 @@ export default class Game {
         return this;
     }
 
+    getCamera(): any {
+        return this.camera;
+    }
+
     setZoom(zoom: number): Game {
         this.zoom = zoom;
         this.camera.setZoom(zoom);
@@ -182,7 +199,7 @@ export default class Game {
 
     _placeAgent(agent: any, info: VizObjectMessage) {
         const pos = info.Position;
-        agent.setPosition(pos[0], this.agentaltitude, pos[1]);
+        agent.setLocalPosition(pos[0], this.agentaltitude, pos[1]);
 
         const orientation = info.Orientation;
         const orientationDegrees = orientation * (360 / (2 * Math.PI));
@@ -191,6 +208,6 @@ export default class Game {
 
     _placeProjectile(projectile: any, info: VizObjectMessage) {
         const pos = info.Position;
-        projectile.setPosition(pos[0], this.agentaltitude, pos[1]);
+        projectile.setLocalPosition(pos[0], this.agentaltitude, pos[1]);
     }
 }

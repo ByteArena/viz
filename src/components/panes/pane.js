@@ -46,8 +46,9 @@ function Pane(
     }
 
     function onDragFinished() {
-        const { width } = canvasRef.getBoundingClientRect();
-        dispatch(actions.game.resize(pc.FILLMODE_NONE, width, window.innerHeight));
+        //const { width } = canvasRef.getBoundingClientRect();
+        //dispatch(actions.game.resize(pc.FILLMODE_NONE, width, window.innerHeight));
+        window.dispatchEvent(new Event('resize'));
     }
 
     return (

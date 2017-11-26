@@ -25,14 +25,7 @@ function initpc(dispatch: StoreDispatch) {
         app = data;
     }
 
-    function onAppConfigured(/* app */) {
-        const width = window.document
-            .getElementById("application-canvas")
-            .getBoundingClientRect().width;
-
-        const height = window.innerHeight;
-        app.setCanvasFillMode(pc.FILLMODE_NONE, width, height);
-    }
+    const onAppConfigured = app => {};
 
     function onSceneLoaded(/* scene */) {
         if (!app) return;
