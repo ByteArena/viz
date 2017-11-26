@@ -2,8 +2,6 @@
 
 import React from "react";
 import { css } from "emotion";
-import PropTypes from "prop-types";
-import { connect } from "react-redux"
 
 import { Pane } from "./components/panes/pane";
 import CameraSelect from "./containers/camera-select";
@@ -19,26 +17,9 @@ const rightPaneClass = css`
 
 type Props = {
     canvasRef: Object,
-
-    settings: {
-        zoom: number,
-        camera: string,
-    },
 };
 
-type Context = {
-    game: ?Game,
-};
-
-function App({ canvasRef, settings }: Props, { game }: Context) {
-
-    if (game != null) {
-        game.setZoom(settings.zoom);
-    }
-
-    if (game != null) {
-        game.setCamera(settings.camera);
-    }
+export function App({ canvasRef }: Props) {
 
     return (
         <div>
@@ -55,16 +36,4 @@ function App({ canvasRef, settings }: Props, { game }: Context) {
         </div>
     );
 }
-
-App.contextTypes = {
-    game: PropTypes.object,
-};
-
-const mapStateToProps = (state) => ({
-    settings: state.settings,
-});
-
-export default connect(
-    mapStateToProps,
-)(App)
 

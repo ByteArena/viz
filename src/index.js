@@ -1,108 +1,81 @@
 // @flow
 
-import React, { Component } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import PropTypes from "prop-types";
 import { createStore, applyMiddleware } from 'redux'
-import { connect, Provider as ReduxProvider } from 'react-redux'
+import { Provider as ReduxProvider } from 'react-redux'
 
 import * as settings from "./storage/settings";
 import comm from "./internal/comm";
 import reducer from "./reducers"
 import Game from "./game/game";
-import App from "./app";
+import { App } from "./app";
 import actions from "./actions";
 import { registrerEvents } from "./events"
 
 const hasPlaycanvas = typeof window._startpc !== "undefined";
 const canvasRef = document.createElement("div");
 
-type State = {
-    app: ?Object,
-    game: ?Game,
-};
+let game;
 
-class Provider extends Component<any, State> {
-    static childContextTypes = {
-        game: PropTypes.object,
-    };
+function initpc(dispatch: StoreDispatch) {
+    let app: any;
 
-    state: State = {
-        app: undefined,
-        game: undefined,
-    };
-
-    getChildContext() {
-        return {
-            game: this.state.game,
-        };
+    function onAppCreated(data) {
+        app = data;
     }
 
-    componentDidMount() {
-        const onAppCreated = app => this.setState({ app });
+    function onAppConfigured(/* app */) {
+        const width = window.document
+            .getElementById("application-canvas")
+            .getBoundingClientRect().width;
 
-        const onAppConfigured = app => {
-            const width = window.document
-                .getElementById("application-canvas")
-                .getBoundingClientRect().width;
+        const height = window.innerHeight;
+        app.setCanvasFillMode(pc.FILLMODE_NONE, width, height);
+    }
 
-            const height = window.innerHeight;
-            app.setCanvasFillMode(pc.FILLMODE_NONE, width, height);
-        };
+    function onSceneLoaded(/* scene */) {
+        if (!app) return;
 
-        const onSceneLoaded = (/*scene*/) => {
-            const { app } = this.state;
+        const settings = window.BAVizSettings;
 
-            if (!app) return;
+        game = new Game(app);
+        game.init();
 
-            const settings = window.BAVizSettings;
+        app.update = game.update.bind(game);
 
-            const game = new Game(app);
-            game.init();
-
-            this.setState({ game });
-
-            app.update = game.update.bind(game);
-
-            comm(
-                settings.wsurl,
-                settings.tps,
-                game.onFrame.bind(game),
-                (type: string, data: any) => {
-                    switch(type) {
-                        case "status": {
-                            this.props.dispatch(actions.status.updateStatus(data))
-                            break;
-                        }
-                        case "init": {
-                            this.props.dispatch(actions.agent.clear())
-
-                            data.agents.forEach(agent => {
-                                this.props.dispatch(actions.agent.addAgent(agent.AgentName, agent.Id))
-                            })
-                            break;
-                        }
+        comm(
+            settings.wsurl,
+            settings.tps,
+            game.onFrame.bind(game),
+            (type: string, data: any) => {
+                switch(type) {
+                    case "status": {
+                        dispatch(actions.status.updateStatus(data))
+                        break;
                     }
-                },
-            );
-        };
+                    case "init": {
+                        dispatch(actions.agent.clear())
 
-        if (hasPlaycanvas) {
-            window._startpc(
-                canvasRef,
-                onAppCreated,
-                onAppConfigured,
-                onSceneLoaded,
-            );
-        } else {
-            console.warn("PlayCanvas has not been detected");
-        }
+                        data.agents.forEach(agent => {
+                            dispatch(actions.agent.addAgent(agent.AgentName, agent.Id))
+                        })
+                        break;
+                    }
+                }
+            },
+        );
     }
 
-    render() {
-        const children = React.cloneElement(this.props.children, { canvasRef });
-
-        return <div>{children}</div>;
+    if (hasPlaycanvas) {
+        window._startpc(
+            canvasRef,
+            onAppCreated,
+            onAppConfigured,
+            onSceneLoaded,
+        );
+    } else {
+        console.warn("PlayCanvas has not been detected");
     }
 }
 
@@ -113,19 +86,20 @@ const store = createStore(
 
 settings.restoreState(store.dispatch);
 
-const OurProvider = connect()(Provider)
+store.subscribe(() => {
+    const {settings} = store.getState();
 
-function Main() {
-    return (
-        <OurProvider>
-            <App />
-        </OurProvider>
-    );
-}
+    if (game != null) {
+        game.setZoom(settings.zoom);
+        game.setCamera(settings.camera);
+    }
+});
+
+initpc(store.dispatch);
 
 ReactDOM.render(
     <ReduxProvider store={store}>
-        <Main />
+        <App canvasRef={canvasRef} />
     </ReduxProvider>,
     document.getElementById("root"), // eslint-disable-line flowtype-errors/show-errors
 );
