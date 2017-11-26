@@ -22,6 +22,7 @@ module.exports = {
         "react/forbid-component-props": "off",
         "react/jsx-one-expression-per-line": "off",
         "react/no-unused-prop-types": "off",
+        "react/jsx-sort-props": "off",
         "no-console": "off",
         "comma-dangle": [
             "error",

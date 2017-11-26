@@ -5,10 +5,10 @@ import { css } from "emotion";
 import PropTypes from "prop-types";
 
 import { Pane } from "./components/panes/pane";
-import { AgentList } from "./components/agent-list";
 import { ZoomSlider } from "./components/zoom-slider";
 import { CameraSelect } from "./components/camera-select";
-import { StatusIndicator } from "./components/status-indicator";
+import AgentList from "./containers/agent-list";
+import StatusIndicator from "./containers/status-indicator";
 
 const rightPaneClass = css`
     height: 100%;

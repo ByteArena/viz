@@ -3,10 +3,14 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
+import { createStore } from 'redux'
+import { connect, Provider as ReduxProvider } from 'react-redux'
 
 import comm from "./internal/comm";
+import reducer from "./reducers"
 import Game from "./game/game";
 import { App } from "./app";
+import actions from "./actions";
 
 const hasPlaycanvas = typeof window._startpc !== "undefined";
 const canvasRef = document.createElement("div");
@@ -14,40 +18,21 @@ const canvasRef = document.createElement("div");
 type State = {
     app: ?Object,
     game: ?Game,
-    subscribeTo: (string, Object) => void,
-    ref: Object,
 };
-
-const subscriptions = {
-    init: () => {},
-    status: () => {},
-};
-
-function subscribeTo(eventName, cb) {
-    if (typeof subscriptions[eventName] === "undefined") {
-        throw new Error(`Cannot subscribeTo ${eventName}`);
-    }
-
-    subscriptions[eventName] = cb;
-}
 
 class Provider extends Component<any, State> {
     static childContextTypes = {
         game: PropTypes.object,
-        subscribeTo: PropTypes.func,
     };
 
     state: State = {
         app: undefined,
         game: undefined,
-        subscribeTo,
-        ref: undefined,
     };
 
     getChildContext() {
         return {
             game: this.state.game,
-            subscribeTo: this.state.subscribeTo,
         };
     }
 
@@ -81,8 +66,19 @@ class Provider extends Component<any, State> {
                 settings.wsurl,
                 settings.tps,
                 game.onFrame.bind(game),
-                function(type: string, data: any) {
-                    subscriptions[type](data);
+                (type: string, data: any) => {
+                    switch(type) {
+                        case "status": {
+                            this.props.dispatch(actions.status.updateStatus(data))
+                            break;
+                        }
+                        case "init": {
+                            data.agents.forEach(agent => {
+                                this.props.dispatch(actions.agent.addAgent(agent.AgentName, agent.Id))
+                            })
+                            break;
+                        }
+                    }
                 },
             );
         };
@@ -106,9 +102,21 @@ class Provider extends Component<any, State> {
     }
 }
 
+const store = createStore(reducer)
+
+const OurProvider = connect()(Provider)
+
+function Main() {
+    return (
+        <OurProvider>
+            <App />
+        </OurProvider>
+    );
+}
+
 ReactDOM.render(
-    <Provider>
-        <App />
-    </Provider>,
+    <ReduxProvider store={store}>
+        <Main />
+    </ReduxProvider>,
     document.getElementById("root"), // eslint-disable-line flowtype-errors/show-errors
 );
