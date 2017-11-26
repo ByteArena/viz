@@ -14,7 +14,7 @@ function AgentList({ agents }: Props) {
             <ul>
                 {agents.map(c => (
                     <li key={c.id}>
-                        {c.name}
+                        {c.name} - {c.score}
                     </li>
                 ))}
             </ul>

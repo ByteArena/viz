@@ -27,6 +27,9 @@ type VizObjectMessage = {
     Velocity: Vec2Array,
     Radius: number,
     Orientation: number,
+    Score: {
+        Value: number,
+    },
 };
 
 type VizObstacleMessage = {

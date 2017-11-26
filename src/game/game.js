@@ -2,6 +2,7 @@
 
 import RemoteFollowCamera from "../camera/remotefollow";
 import OrthoTopCamera from "../camera/orthotop";
+import actions from "../actions";
 
 import DrawGridHelper from "../helper/drawGrid";
 //import DebugPointsHelper from "../helper/debugPoints";
@@ -9,6 +10,7 @@ import DebugSegmentsHelper from "../helper/debugSegments";
 
 export default class Game {
     app: Object;
+    dispatch: StoreDispatch;
 
     camera: Object;
     gridDrawer: Object;
@@ -25,10 +27,11 @@ export default class Game {
     debug: boolean;
     agentaltitude: number;
 
-    constructor(app: Object) {
+    constructor(app: Object, dispatch: StoreDispatch) {
         this.app = app;
         this.debug = false;
         this.agentaltitude = 0.04;
+        this.dispatch = dispatch;
     }
 
     init() {
@@ -91,6 +94,10 @@ export default class Game {
                     //agent.model.model.meshInstances[0].material = this.agentMaterial;
                 } else {
                     agent = this.agentEntities[msg.Id];
+                }
+
+                if (msg.Score) {
+                    this.dispatch(actions.agent.updateAgentScore(msg.Score.Value, msg.Id));
                 }
 
                 this._placeAgent(agent, msg);

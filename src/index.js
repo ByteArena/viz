@@ -39,7 +39,7 @@ function initpc(dispatch: StoreDispatch) {
 
         const settings = window.BAVizSettings;
 
-        game = new Game(app);
+        game = new Game(app, dispatch);
         game.init();
 
         app.update = game.update.bind(game);

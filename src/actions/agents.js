@@ -8,6 +8,14 @@ export function addAgent(name: string, id: string) {
     }
 }
 
+export function updateAgentScore(value: number, id: string) {
+    return {
+        type: "UPDATE_AGENT_SCORE",
+        value,
+        id,
+    }
+}
+
 export function clear() {
     return { type: "CLEAR" };
 }
