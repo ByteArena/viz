@@ -35,6 +35,9 @@ export function settings(
                 camera: action.value,
             });
 
+        case "RESTORE":
+            return action.settings
+
         default:
             return state
     }

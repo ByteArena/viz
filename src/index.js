@@ -3,9 +3,10 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import { connect, Provider as ReduxProvider } from 'react-redux'
 
+import * as settings from "./storage/settings";
 import comm from "./internal/comm";
 import reducer from "./reducers"
 import Game from "./game/game";
@@ -105,7 +106,12 @@ class Provider extends Component<any, State> {
     }
 }
 
-const store = createStore(reducer)
+const store = createStore(
+    reducer,
+    applyMiddleware(settings.persistSettings),
+);
+
+settings.restoreState(store.dispatch);
 
 const OurProvider = connect()(Provider)
 

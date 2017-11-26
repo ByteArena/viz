@@ -20,3 +20,10 @@ export function updateCamera(value: string) {
         value,
     }
 }
+
+export function restore(settings: any) {
+    return {
+        type: "RESTORE",
+        settings,
+    }
+}

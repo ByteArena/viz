@@ -44,3 +44,6 @@ interface Camera {
     setZoom(zoom: number): Camera;
     update(followpos: Point3): void;
 }
+
+type StoreDispatch = (Object) => void; // eslint-disable-line no-unused-vars
+
