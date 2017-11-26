@@ -3,7 +3,7 @@
 import React from "react";
 import { css } from "emotion";
 
-import { Pane } from "./components/panes/pane";
+import Pane from "./components/panes/pane";
 import CameraSelect from "./containers/camera-select";
 import AgentList from "./containers/agent-list";
 import StatusIndicator from "./containers/status-indicator";

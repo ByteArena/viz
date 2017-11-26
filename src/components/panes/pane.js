@@ -4,6 +4,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import SplitPane from "react-split-pane";
 import { css } from "emotion";
+import { connect } from "react-redux"
+
+import actions from "../../actions";
 
 const resizerStyle = {
     width: "5px",
@@ -24,19 +27,15 @@ type Props = {
     size: number,
     className: string,
     canvasRef: Object,
-};
-
-type Context = {
-    game: Game,
+    dispatch: StoreDispatch,
 };
 
 function Element({ children }: any) {
     return <div className={elementClassName}>{children}</div>;
 }
 
-export function Pane(
-    { canvasRef, className, children, size }: Props,
-    { game }: Context,
+function Pane(
+    { canvasRef, className, children, size, dispatch }: Props,
 ) {
     const elements = React.Children.map(children, item => (
         <Element>{item}</Element>
@@ -48,11 +47,7 @@ export function Pane(
 
     function onDragFinished() {
         const { width } = canvasRef.getBoundingClientRect();
-
-        game &&
-            game
-                .getApp()
-                .setCanvasFillMode(pc.FILLMODE_NONE, width, window.innerHeight);
+        dispatch(actions.game.resize(pc.FILLMODE_NONE, width, window.innerHeight));
     }
 
     return (
@@ -72,3 +67,5 @@ export function Pane(
 Pane.contextTypes = {
     game: PropTypes.object,
 };
+
+export default connect()(Pane);

@@ -87,11 +87,17 @@ const store = createStore(
 settings.restoreState(store.dispatch);
 
 store.subscribe(() => {
-    const {settings} = store.getState();
+    const state = store.getState();
 
     if (game != null) {
-        game.setZoom(settings.zoom);
-        game.setCamera(settings.camera);
+        game.setZoom(state.settings.zoom);
+        game.setCamera(state.settings.camera);
+
+        if (state.game != null) {
+            game
+                .getApp()
+                .setCanvasFillMode(state.game.mode, state.game.width, state.game.height);
+        }
     }
 });
 
