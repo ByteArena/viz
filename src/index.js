@@ -47,11 +47,14 @@ function initpc(dispatch: StoreDispatch) {
         comm(
             settings.wsurl,
             settings.tps,
-            game.onFrame.bind(game),
             (type: string, data: any) => {
                 switch(type) {
                     case "status": {
                         dispatch(actions.status.updateStatus(data))
+                        break;
+                    }
+                    case "frame": {
+                        dispatch(actions.game.addFrame(data))
                         break;
                     }
                     case "init": {
@@ -93,10 +96,14 @@ store.subscribe(() => {
         game.setZoom(state.settings.zoom);
         game.setCamera(state.settings.camera);
 
-        if (state.game != null) {
+        if (typeof state.game.mode !== "undefined") {
             game
                 .getApp()
                 .setCanvasFillMode(state.game.mode, state.game.width, state.game.height);
+        }
+
+        if (typeof state.game.frame !== "undefined") {
+            game.onFrame(state.game.frame);
         }
     }
 });

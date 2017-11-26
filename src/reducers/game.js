@@ -1,7 +1,13 @@
 // @flow
 
-type State = any;
-const initialState: State = null;
+type State = {
+    width: ?number,
+    height: ?number,
+    mode: ?string,
+    frame: ?Vizmessage,
+};
+
+const initialState: State = {};
 
 export function game(
     state: State = initialState,
@@ -10,11 +16,16 @@ export function game(
     switch (action.type) {
         case "RESIZE":
 
-            return {
+            return Object.assign({}, state, {
                 width: action.width,
                 height: action.height,
                 mode: action.mode,
-            }
+            });
+
+        case "ADD_FRAME":
+            return Object.assign({}, state, {
+                frame: action.frame,
+            });
 
         default:
             return state

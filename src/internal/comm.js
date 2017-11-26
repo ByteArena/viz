@@ -6,7 +6,6 @@ import { Bucket, Frame } from "./bucket";
 export default function comm(
     websocketurl: string,
     tps: number,
-    onMessage: (message: Object) => void,
     onData: (type: string, data: any) => void,
 ) {
     let ws = null;
@@ -66,6 +65,10 @@ export default function comm(
     }
 
     retry();
+
+    function onMessage(frame: Vizmessage) {
+        onData("frame", frame)
+    }
 
     window.setInterval(function() {
         const next3 = bucket.next3();

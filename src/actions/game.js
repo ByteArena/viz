@@ -8,3 +8,9 @@ export function resize(mode: string, width: number, height: number) {
         height,
     }
 }
+export function addFrame(frame: Vizmessage) {
+    return {
+        type: "ADD_FRAME",
+        frame,
+    };
+}
