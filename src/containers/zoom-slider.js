@@ -1,7 +1,7 @@
 // @flow
 
-import React from "react"
-import { connect } from "react-redux"
+import React from "react";
+import { connect } from "react-redux";
 import { css } from "emotion";
 import actions from "../actions";
 
@@ -10,28 +10,29 @@ const containerClass = css`
     flex: 1;
 `;
 
-const sliderClass = css`width: 100%;`;
+const sliderClass = css`
+    width: 85%;
+`;
 
 const indicatorClass = css`
-    width: 30%;
+    width: 15%;
     padding: 4px 0px;
+    padding-left: 4px;
+    text-align: right;
 `;
 
 type Props = {
     zoom: number,
-    dispatch: (any) => void,
+    dispatch: any => void,
 };
 
 function ZoomSlider({ zoom, dispatch }: Props) {
-
     function handleChange(e: any) {
-        dispatch(actions.settings.updateZoom(e.target.value))
+        dispatch(actions.settings.updateZoom(e.target.value));
     }
 
     return (
         <div className={containerClass}>
-            <div className={indicatorClass}>{zoom}%</div>
-
             <div className={sliderClass}>
                 <input
                     className={sliderClass}
@@ -40,16 +41,13 @@ function ZoomSlider({ zoom, dispatch }: Props) {
                     value={zoom}
                 />
             </div>
+            <div className={indicatorClass}>{zoom}%</div>
         </div>
     );
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
     zoom: state.settings.zoom,
 });
 
-export default connect(
-    mapStateToProps,
-)(ZoomSlider)
-
-
+export default connect(mapStateToProps)(ZoomSlider);

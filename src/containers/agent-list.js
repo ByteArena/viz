@@ -11,13 +11,9 @@ function AgentList({ agents }: Props) {
 
     return (
         <div>
-            <ul>
-                {agents.map(c => (
-                    <li key={c.id}>
-                        {c.name} - {c.score}
-                    </li>
-                ))}
-            </ul>
+            {agents.map(c => (
+                <span key={c.id}>• {c.name} - {c.score}</span>
+            ))}
         </div>
     );
 }

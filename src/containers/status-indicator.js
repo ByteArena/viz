@@ -8,10 +8,6 @@ const indicatorClass = css`
     display: inline;
 `;
 
-const labelClass = css`
-    width: 23%;
-`;
-
 const containerClass = css`
     display: flex;
     flex: 1;
@@ -55,8 +51,6 @@ function StatusIndicator({ status }: Props) {
 
     return (
         <div className={containerClass}>
-            <div className={labelClass}>Server</div>
-
             {child}
         </div>
     );

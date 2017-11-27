@@ -12,8 +12,6 @@ const containerClass = css`
     flex: 1;
 `;
 
-const labelClass = css`width: 30%;`;
-
 const DEFAULT_CAM = "default";
 const TOP_CAM = "orthotop";
 
@@ -30,16 +28,14 @@ function CameraSelect({ camera, dispatch }: Props) {
 
     return (
         <div className={containerClass}>
-            <div className={labelClass}>Camera</div>
-
             <div className={selectClass}>
                 <select
                     className={selectClass}
                     onChange={handleChange}
                     value={camera}
                 >
-                    <option value={DEFAULT_CAM}>{DEFAULT_CAM}</option>
-                    <option value={TOP_CAM}>{TOP_CAM}</option>
+                    <option value={DEFAULT_CAM}>[D]efault - Perspective</option>
+                    <option value={TOP_CAM}>[T]op - Ortho</option>
                 </select>
             </div>
         </div>
