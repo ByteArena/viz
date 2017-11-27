@@ -1,13 +1,10 @@
 // @flow
 
 type State = {
-    width?: number,
-    height?: number,
-    mode?: string,
+    frame?: Object,
 };
 
-const initialState: State = {
-};
+const initialState: State = {};
 
 export function game(state: State = initialState, action: Object): State {
     switch (action.type) {

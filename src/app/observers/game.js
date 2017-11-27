@@ -6,12 +6,12 @@ type GetGame = () => ?Game;
 
 export function observeStoreUpdateGameFrame(store: Object, getGame: GetGame) {
 
-    observeStore(store, ({game}) => game.frame, (frame) => {
+    observeStore(store, ({game}) => game, (gameState) => {
         const game = getGame();
 
         if (game != null) {
-            if (typeof frame !== "undefined") {
-                game.onFrame(frame);
+            if (typeof gameState.frame !== "undefined") {
+                game.onFrame(gameState.frame);
             }
         }
     });
