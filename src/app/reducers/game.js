@@ -7,10 +7,12 @@ type State = {
     height?: number,
     mode?: string,
     bucket: Object,
+    interpolationProcess?: Promise<Object>,
 };
 
 const initialState: State = {
-    bucket: new Bucket(600), // circular buffer of 600 frames
+    bucket: new Bucket(),
+    interpolationProcess: undefined,
 };
 
 export function game(state: State = initialState, action: Object): State {
@@ -22,9 +24,10 @@ export function game(state: State = initialState, action: Object): State {
                 mode: action.mode,
             });
 
-        case "ADD_FRAME_BATCH": {
+        case "ADD_FRAME_BUCKET": {
             const newState = Object.assign({}, state);
             newState.bucket.addFrames(action.frames);
+
             return newState;
         }
 

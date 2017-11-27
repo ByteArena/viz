@@ -1,26 +1,16 @@
 // @flow
 
-export function observeStore({
-    store,
-    select,
-    compare,
-    onChange,
-}: {
+export function observeStore(
     store: Object,
-    select: Object => Object,
-    compare: ?(Object, Object) => boolean,
-    onChange: Object => void,
-}) {
+    select: (Object) => Object,
+    onChange: (Object) => void,
+) {
     let currentState;
 
     function handleChange() {
-        if (!compare) {
-            compare = (curstate: Object, newstate: Object) => curstate === newstate;
-        }
-
         let nextState = select(store.getState());
 
-        if (!compare(currentState, nextState)) {
+        if (nextState !== currentState) {
             currentState = nextState;
             onChange(currentState);
         }

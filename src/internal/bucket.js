@@ -4,21 +4,13 @@ import Deque from "denque";
 
 export class Bucket {
     _frames: Deque;
-    _signature: number;
-    _capacity: number;
 
-    constructor(capacity: number = 600) {
+    constructor() {
         this._frames = new Deque();
-        this._signature = 0;
-        this._capacity = capacity;
     }
 
     addFrames(frames: Frame[]) {
-        this._signature++;
         frames.map(frame => this._frames.push(frame));
-        while (this._frames.length > this._capacity) {
-            this.consumeOne();
-        }
     }
 
     next2(): ?[Frame, Frame] {
@@ -43,7 +35,6 @@ export class Bucket {
     }
 
     consumeOne(): ?Frame {
-        this._signature++;
         return this._frames.shift();
     }
 }

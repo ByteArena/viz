@@ -3,7 +3,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import Renderer from "../renderer";
 
 type Props = {
     children: any,
@@ -14,6 +13,10 @@ type Props = {
 
 function Layout({ canvasRef, children, toolbarHeight }: Props) {
     const elements = React.Children.map(children, item => item);
+
+    function inject(node) {
+        node && node.appendChild(canvasRef);
+    }
 
     return (
         <div
@@ -32,15 +35,16 @@ function Layout({ canvasRef, children, toolbarHeight }: Props) {
             >
                 {elements}
             </div>
-            <div style={{ display: "flex", flexGrow: "1" }}>
-                <Renderer canvasRef={canvasRef} />
-            </div>
+            <div
+                style={{ display: "flex", flexGrow: "1" }}
+                ref={inject}
+            />
         </div>
     );
 }
 
-// Layout.contextTypes = {
-//     game: PropTypes.object,
-// };
+Layout.contextTypes = {
+    game: PropTypes.object,
+};
 
 export default connect()(Layout);
