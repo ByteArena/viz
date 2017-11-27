@@ -56,11 +56,6 @@ function initpc(dispatch: StoreDispatch) {
 
         gameSettingsStorage.restoreState(dispatch);
 
-        // // Dispatch RAF
-        // window.setInterval(function() {
-        //     dispatch(actions.game.animationFrame())
-        // }, 1000 / settings.tps);
-
         comm(
             settings.wsurl,
             settings.tps,
@@ -70,8 +65,8 @@ function initpc(dispatch: StoreDispatch) {
                         dispatch(actions.status.updateStatus(data))
                         break;
                     }
-                    case "framebatch": {
-                        dispatch(actions.game.addFrameBatch(data))
+                    case "frame": {
+                        dispatch(actions.game.addFrame(data))
                         break;
                     }
                     case "init": {

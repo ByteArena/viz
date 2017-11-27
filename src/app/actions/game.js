@@ -10,7 +10,6 @@ export function resize(mode: string, width: number, height: number) {
 }
 
 export function addFrameBatch(frames: Array<Vizmessage>) {
-    console.log(frames);
     return {
         type: "ADD_FRAME_BUCKET",
         frames,
@@ -20,3 +19,11 @@ export function addFrameBatch(frames: Array<Vizmessage>) {
 export function animationFrame() {
     return { type: "ANIMATION_FRAME" };
 }
+
+export function addFrame(frame: Vizmessage) {
+    return {
+        type: "ADD_FRAME",
+        frame,
+    };
+}
+
