@@ -1,7 +1,6 @@
 // @flow
 
-import expandAndInterpolateBatch from "./expandinterpolate";
-import { Bucket, Frame } from "./bucket";
+import { Frame } from "./bucket";
 
 export default function comm(
     websocketurl: string,
@@ -9,7 +8,6 @@ export default function comm(
     onData: (type: string, data: any) => void,
 ) {
     let ws = null;
-    const bucket = new Bucket();
 
     function retry() {
         try {
@@ -42,7 +40,8 @@ export default function comm(
 
                 switch (msg.type) {
                     case "framebatch": {
-                        bucket.addFrames(msg.data.map(Frame.fromVizmessage));
+
+                        onData("framebatch", msg.data.map(Frame.fromVizmessage));
                         break;
                     }
 
@@ -65,16 +64,4 @@ export default function comm(
     }
 
     retry();
-
-    function onMessage(frame: Vizmessage) {
-        onData("frame", frame)
-    }
-
-    window.setInterval(function() {
-        const next3 = bucket.next3();
-        if (next3) {
-            bucket.consumeOne();
-            expandAndInterpolateBatch(next3, tps, 60, onMessage); // TODO(jerome): remove 60 (fps) and rely on rAF rate
-        }
-    }, 1000 / tps);
 }

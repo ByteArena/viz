@@ -6,13 +6,16 @@ type GetGame = () => ?Game;
 
 export function observeStoreUpdateGameFrame(store: Object, getGame: GetGame) {
 
-    observeStore(store, ({game}) => game.frame, (frame) => {
+    observeStore(store, ({game}) => game.interpolationProcess, (interpolationProcess) => {
         const game = getGame();
 
-        if (game != null) {
-            if (typeof frame !== "undefined") {
-                game.onFrame(frame);
-            }
+        if (game != null && interpolationProcess) {
+
+            interpolationProcess
+                .then(frame => {
+                    game.onFrame(frame);
+                })
+                .catch(err => console.error(err))
         }
     });
 }

@@ -8,9 +8,14 @@ export function resize(mode: string, width: number, height: number) {
         height,
     }
 }
-export function addFrame(frame: Vizmessage) {
+
+export function addFrameBatch(frames: Array<Vizmessage>) {
     return {
-        type: "ADD_FRAME",
-        frame,
+        type: "ADD_FRAME_BUCKET",
+        frames,
     };
+}
+
+export function annimationFrame() {
+    return { type: "ANIMATION_FRAME" };
 }
