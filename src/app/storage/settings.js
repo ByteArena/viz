@@ -16,10 +16,7 @@ export function restoreState(dispatch: StoreDispatch) {
     }
 }
 
-export const persistSettings = (store: Object) => (next: any) => (action: any) => {
-    const result = next(action);
-
-    const settings = store.getState().settings;
+export function persistSettings(settings: Object) {
     const json = JSON.stringify(settings);
 
     if ("localStorage" in window) {
@@ -29,6 +26,4 @@ export const persistSettings = (store: Object) => (next: any) => (action: any) =
             // Ignore
         }
     }
-
-    return result
 }
