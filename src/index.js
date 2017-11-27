@@ -5,13 +5,14 @@ import ReactDOM from "react-dom";
 import { createStore, applyMiddleware } from 'redux'
 import { Provider as ReduxProvider } from 'react-redux'
 
-import * as settings from "./storage/settings";
+import * as gameSettingsStorage from "./storage/settings";
 import comm from "./internal/comm";
 import reducer from "./reducers"
 import Game from "./game/game";
 import { App } from "./app";
 import actions from "./actions";
 import { registrerEvents } from "./events"
+import { observeStoreUpdateGameFrame, observeStoreUpdateGameSettings } from "./observers/game"
 
 const hasPlaycanvas = typeof window._startpc !== "undefined";
 const canvasRef = document.createElement("div");
@@ -37,6 +38,8 @@ function initpc(dispatch: StoreDispatch) {
 
         app.update = game.update.bind(game);
 
+        gameSettingsStorage.restoreState(dispatch);
+
         comm(
             settings.wsurl,
             settings.tps,
@@ -56,6 +59,7 @@ function initpc(dispatch: StoreDispatch) {
                         data.agents.forEach(agent => {
                             dispatch(actions.agent.addAgent(agent.AgentName, agent.Id))
                         })
+
                         break;
                     }
                 }
@@ -77,29 +81,11 @@ function initpc(dispatch: StoreDispatch) {
 
 const store = createStore(
     reducer,
-    applyMiddleware(settings.persistSettings),
+    applyMiddleware(gameSettingsStorage.persistSettings),
 );
 
-settings.restoreState(store.dispatch);
-
-store.subscribe(() => {
-    const state = store.getState();
-
-    if (game != null) {
-        game.setZoom(state.settings.zoom);
-        game.setCamera(state.settings.camera);
-
-        if (typeof state.game.mode !== "undefined") {
-            game
-                .getApp()
-                .setCanvasFillMode(state.game.mode, state.game.width, state.game.height);
-        }
-
-        if (typeof state.game.frame !== "undefined") {
-            game.onFrame(state.game.frame);
-        }
-    }
-});
+observeStoreUpdateGameFrame(store, () => game);
+observeStoreUpdateGameSettings(store, () => game);
 
 initpc(store.dispatch);
 
