@@ -17,15 +17,16 @@ const rightPaneClass = css`
 
 type Props = {
     canvasRef: Object,
+    toolbarHeight: number,
 };
 
-export function App({ canvasRef }: Props) {
+export function App({ canvasRef, toolbarHeight }: Props) {
 
     return (
         <div>
             <Pane
                 className={rightPaneClass}
-                size={20}
+                toolbarHeight={toolbarHeight}
                 canvasRef={canvasRef}
             >
                 <ZoomSlider />

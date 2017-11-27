@@ -40,7 +40,7 @@ export default class Game {
         this.debug = document.location.href.split("debug=").length > 1;
 
         this.setCamera("default");
-        this.setZoom(50);
+        this.setZoom(80);
 
         if (this.debug) {
             this.debugSegmentsDrawer = new DebugSegmentsHelper(0.1);
@@ -109,9 +109,9 @@ export default class Game {
                     agent = this.agentEntities[msg.Id];
                 }
 
-                if (msg.Score) {
-                    this.dispatch(actions.agent.updateAgentScore(msg.Score.Value, msg.Id));
-                }
+                // if (msg.Score) {
+                //     this.dispatch(actions.agent.updateAgentScore(msg.Score.Value, msg.Id));
+                // }
 
                 this._placeAgent(agent, msg);
             } else if (msg.Type === "projectile") {

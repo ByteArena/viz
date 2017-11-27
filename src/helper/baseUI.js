@@ -18,39 +18,38 @@ export default class BaseUI {
         template.element.pivot = new pc.Vec2(0.5, 0.5);
         template.element.anchor = new pc.Vec4(0.0, 0.0, 0.0, 0.0);
         this._font = template.element.font;
-        //template.parent.destroy();
-        //this.restart();
-        this._screen2d = template.parent;
-        this._screen2d.setPosition(0, 0, 0);
-        this._screen2d.setLocalPosition(0, 0, 0);
-        this._screen2d.addComponent("screen");
-        this._screen2d.screen.screenSpace = true;
-        this._screen2d.screen.scaleMode = pc.SCALEMODE_NONE;
+        template.parent.destroy();
+        this.restart();
+        // this._screen2d = template.parent;
+        // this._screen2d.setPosition(0, 0, 0);
+        // this._screen2d.setLocalPosition(0, 0, 0);
+        // this._screen2d.addComponent("screen");
+        // this._screen2d.screen.screenSpace = true;
+        // this._screen2d.screen.scaleMode = pc.SCALEMODE_NONE;
     }
 
-    // restart() {
-    //     if(this._screen2d) this._screen2d.destroy();
+    restart() {
+        if(this._screen2d) this._screen2d.destroy();
 
-    //     const screen2d = new pc.Entity();
-    //     screen2d.setPosition(0, 0, 0);
-    //     screen2d.setLocalPosition(0, 0, 0);
-    //     screen2d.addComponent("screen");
-    //     screen2d.screen.screenSpace = true;
-    //     screen2d.screen.scaleMode = pc.SCALEMODE_NONE;
-    //     this._screen2d = screen2d;
-    //     this._game.getApp().root.addChild(screen2d);
-    // }
+        const screen2d = new pc.Entity();
+        screen2d.setPosition(0, 0, 0);
+        screen2d.setLocalPosition(0, 0, 0);
+        screen2d.addComponent("screen");
+        screen2d.screen.screenSpace = true;
+        screen2d.screen.scaleMode = pc.SCALEMODE_NONE;
+        this._screen2d = screen2d;
+        this._game.getApp().root.addChild(screen2d);
+    }
 
     update() { }
 
-    createGroup(/*name: string*/): any {
-        return this._screen2d;
-        // const group = new pc.Entity();
-        // group.addComponent("element", { type: "group" });
-        // group.setName(name);
-        // this._screen2d.addChild(group);
+    createGroup(name: string): any {
+        const group = new pc.Entity();
+        group.addComponent("element", { type: "group" });
+        group.setName(name);
+        this._screen2d.addChild(group);
 
-        // return group;
+        return group;
     }
 
     getFontAsset(): any {

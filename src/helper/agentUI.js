@@ -14,10 +14,7 @@ export default class AgentUI {
     }
 
     init() {
-        //this._container = this._baseui.createGroup("agentui");
-        window.addEventListener("resize", () => {
-            pc.app.graphicsDevice.updateClientRect();
-        })
+        this._container = this._baseui.createGroup("agentui");
     }
 
     update(agentEntities: Object) {
@@ -52,7 +49,7 @@ export default class AgentUI {
         entity.element.fontSize = 24;
         entity.element.pivot = new pc.Vec2(0.5, 0.5);
         entity.element.anchor = new pc.Vec4(0.0, 0.0, 0.0, 0.0);
-        this._baseui._screen2d.addChild(entity);
+        this._container.addChild(entity);
 
         return entity;
     }

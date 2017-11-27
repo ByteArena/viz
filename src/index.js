@@ -16,20 +16,36 @@ import { observeStoreUpdateGameFrame, observeStoreUpdateGameSettings } from "./o
 
 const hasPlaycanvas = typeof window._startpc !== "undefined";
 const canvasRef = document.createElement("div");
+const toolbarHeight = 60;
 
 let game;
 
 function initpc(dispatch: StoreDispatch) {
+
     let app: any;
 
     function onAppCreated(data) {
         app = data;
     }
 
-    const onAppConfigured = app => {};
+    const onAppConfigured = app => {
+
+        const resize = () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight - toolbarHeight; // 60px: height of the toolbar
+            app.setCanvasFillMode(pc.FILLMODE_NONE, width, height);
+            app.setCanvasResolution(pc.RESOLUTION_FIXED, width, height);
+            app.graphicsDevice.updateClientRect();
+        };
+
+        window.addEventListener("resize", resize);
+        resize();
+    };
 
     function onSceneLoaded(/* scene */) {
         if (!app) return;
+
+        app.graphicsDevice.updateClientRect();
 
         const settings = window.BAVizSettings;
 
@@ -44,7 +60,7 @@ function initpc(dispatch: StoreDispatch) {
             settings.wsurl,
             settings.tps,
             (type: string, data: any) => {
-                switch(type) {
+                switch (type) {
                     case "status": {
                         dispatch(actions.status.updateStatus(data))
                         break;
@@ -91,7 +107,10 @@ initpc(store.dispatch);
 
 ReactDOM.render(
     <ReduxProvider store={store}>
-        <App canvasRef={canvasRef} />
+        <App
+            canvasRef={canvasRef}
+            toolbarHeight={toolbarHeight}
+        />
     </ReduxProvider>,
     document.getElementById("root"), // eslint-disable-line flowtype-errors/show-errors
 );
