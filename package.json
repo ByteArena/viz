@@ -53,7 +53,6 @@
     "react-emotion": "^8.0.10",
     "react-rangeslider": "^2.2.0",
     "react-redux": "^5.0.6",
-    "react-split-pane": "^0.1.71",
     "redux": "^3.7.2",
     "rollup": "^0.45.2",
     "rollup-plugin-babel": "^2.7.1",
