@@ -1,14 +1,12 @@
 // @flow
 
-import RemoteFollowCamera from "../camera/remotefollow";
-import OrthoTopCamera from "../camera/orthotop";
-import actions from "../actions";
+import RemoteFollowCamera from "./camera/remotefollow";
+import OrthoTopCamera from "./camera/orthotop";
 
-import DrawGridHelper from "../helper/drawGrid";
-//import DebugPointsHelper from "../helper/debugPoints";
-import DebugSegmentsHelper from "../helper/debugSegments";
-import BaseUI from '../helper/baseUI';
-import AgentUI from '../helper/agentUI';
+import DrawGridHelper from "./helper/drawGrid";
+import DebugSegmentsHelper from "./helper/debugSegments";
+import BaseUI from "./helper/baseUI";
+import AgentUI from "./helper/agentUI";
 
 export default class Game {
     app: Object;
@@ -28,6 +26,9 @@ export default class Game {
 
     debug: boolean;
     agentaltitude: number;
+
+    baseui: BaseUI;
+    agentui: AgentUI;
 
     constructor(app: Object, dispatch: StoreDispatch) {
         this.app = app;
@@ -65,7 +66,6 @@ export default class Game {
     }
 
     update() {
-
         if (this.debug) {
             this.gridDrawer.update(this.app);
         }
@@ -78,10 +78,12 @@ export default class Game {
                 ? this.agentEntities[Object.keys(this.agentEntities)[0]]
                 : null;
 
-        followedAgent && this.getCamera().update(followedAgent.getLocalPosition());
+        followedAgent &&
+            this.getCamera().update(followedAgent.getLocalPosition());
     }
 
     onFrame(frame: Vizmessage) {
+
         if (this.debug) {
             // this.debugPointDrawer.update(this.app, frame.DebugPoints);
             this.debugSegmentsDrawer.update(this.app, frame.DebugSegments);

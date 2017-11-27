@@ -1,6 +1,6 @@
 // @flow
 
-import rangeMap from "../internal/rangemap";
+import rangeMap from "../../internal/rangemap";
 
 export default class RemoteFollowCamera implements Camera {
     _camera: any;

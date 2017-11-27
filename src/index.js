@@ -5,14 +5,14 @@ import ReactDOM from "react-dom";
 import { createStore, applyMiddleware } from 'redux'
 import { Provider as ReduxProvider } from 'react-redux'
 
-import * as gameSettingsStorage from "./storage/settings";
-import comm from "./internal/comm";
-import reducer from "./reducers"
-import Game from "./game/game";
+import * as gameSettingsStorage from "./app/storage/settings";
+import comm from "./internal/comm"; 
+import reducer from "./app/reducers"
+import Game from "./game";
 import { App } from "./app";
-import actions from "./actions";
-import { registrerEvents } from "./events"
-import { observeStoreUpdateGameFrame, observeStoreUpdateGameSettings } from "./observers/game"
+import actions from "./app/actions";
+import { registrerEvents } from "./app/events"
+import { observeStoreUpdateGameFrame, observeStoreUpdateGameSettings } from "./app/observers/game"
 
 const hasPlaycanvas = typeof window._startpc !== "undefined";
 const canvasRef = document.createElement("div");
@@ -56,10 +56,10 @@ function initpc(dispatch: StoreDispatch) {
 
         gameSettingsStorage.restoreState(dispatch);
 
-        // Dispatch RAF
-        window.setInterval(function() {
-            dispatch(actions.game.annimationFrame())
-        }, 1000 / settings.tps);
+        // // Dispatch RAF
+        // window.setInterval(function() {
+        //     dispatch(actions.game.animationFrame())
+        // }, 1000 / settings.tps);
 
         comm(
             settings.wsurl,
@@ -103,6 +103,7 @@ function initpc(dispatch: StoreDispatch) {
 const store = createStore(
     reducer,
     applyMiddleware(gameSettingsStorage.persistSettings),
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
 );
 
 observeStoreUpdateGameFrame(store, () => game);

@@ -13,6 +13,16 @@ export class Bucket {
         frames.map(frame => this._frames.push(frame));
     }
 
+    next2(): ?[Frame, Frame] {
+        const next1 = this._frames.peekAt(0);
+        const next2 = this._frames.peekAt(1);
+        if (next1 === undefined || next2 === undefined) {
+            return undefined;
+        }
+
+        return [next1, next2];
+    }
+
     next3(): ?[Frame, Frame, Frame] {
         const next1 = this._frames.peekAt(0);
         const next2 = this._frames.peekAt(1);

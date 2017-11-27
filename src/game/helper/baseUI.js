@@ -1,6 +1,6 @@
 // @flow
 
-import Game from "../game/game";
+import Game from "../../game";
 
 export default class BaseUI {
 

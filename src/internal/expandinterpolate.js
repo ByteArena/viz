@@ -12,8 +12,8 @@ function objectInfoToProps(objectinfo: VizObjectMessage) {
     };
 }
 
-export default function(
-    next3: [Frame, Frame, Frame],
+export default function expandAndInterpolateBatch(
+    next2: [Frame, Frame],
     tps: number,
     targetfps: number,
     sendFrame: (message: Object) => void,
@@ -29,8 +29,8 @@ export default function(
     // * orientation
     // * position
 
-    const thisframe = next3[0].getPayload();
-    const nextframe = next3[1].getPayload();
+    const thisframe = next2[0].getPayload();
+    const nextframe = next2[1].getPayload();
 
     //
     // Agents
@@ -42,8 +42,7 @@ export default function(
         thisFrameObjectHash[agent.Id].index = thisframeindex;
     });
 
-    const objectDiffs = nextframe.Objects
-        .map(objectInfoToProps)
+    const objectDiffs = nextframe.Objects.map(objectInfoToProps)
         .map(nextprops => {
             if (!(nextprops.id in thisFrameObjectHash)) return;
 
