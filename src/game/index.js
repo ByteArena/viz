@@ -83,7 +83,6 @@ export default class Game {
     }
 
     onFrame(frame: Vizmessage) {
-
         if (this.debug) {
             // this.debugPointDrawer.update(this.app, frame.DebugPoints);
             this.debugSegmentsDrawer.update(this.app, frame.DebugSegments);
