@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "bytearena-sdk": "0.0.1",
+    "deepcopy": "^0.6.3",
     "denque": "^1.1.1"
   }
 }

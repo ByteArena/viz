@@ -7,8 +7,8 @@ export function addFrameBatch(frames: Array<Vizmessage>) {
     };
 }
 
-export function animationFrame() {
-    return { type: "ANIMATION_FRAME" };
+export function processInterpolation() {
+    return { type: "PROCESS_INTERPOLATION" };
 }
 
 export function addFrame(frame: Vizmessage) {

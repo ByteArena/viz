@@ -59,6 +59,11 @@ function initpc(store) {
 
         app.update = game.update.bind(game);
 
+        // Dispatch RAF
+        window.setInterval(function() {
+            store.dispatch(actions.game.processInterpolation())
+        }, 1000 / settings.tps);
+
         comm(
             settings.wsurl,
             settings.tps,
@@ -68,8 +73,12 @@ function initpc(store) {
                         store.dispatch(actions.status.updateStatus(data))
                         break;
                     }
-                    case "frame": {
-                        store.dispatch(actions.game.addFrame(data))
+                    // case "frame": {
+                    //     store.dispatch(actions.game.addFrame(data))
+                    //     break;
+                    // }
+                    case "framebatch": {
+                        store.dispatch(actions.game.addFrameBatch(data))
                         break;
                     }
                     case "init": {
@@ -100,6 +109,7 @@ function initpc(store) {
 
 const store = createStore(
     reducer,
+    // TODO(sven): remove this in prod
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
 );
 
