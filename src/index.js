@@ -16,7 +16,7 @@ import { observeStoreUpdateGameFrame, observeStoreUpdateGameSettings } from "./a
 import { observeStorePersistSettings } from "./app/observers/settings"
 
 const hasPlaycanvas = typeof window._startpc !== "undefined";
-const canvasRef = document.createElement("div");
+const canvasRef = document.createElement("canvas");
 const toolbarHeight = 60;
 
 let game;
