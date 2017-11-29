@@ -112,8 +112,8 @@ export default class Game {
                     agent = this.agentEntities[msg.Id];
                 }
 
-                if (msg.Score) {
-                    this.dispatch(actions.agent.updateAgentScore(msg.Score.Value, msg.PlayerId));
+                if (msg.PlayerInfo) {
+                    this.dispatch(actions.agent.updateAgentScore(msg.PlayerInfo.Score.Value, msg.PlayerInfo.PlayerId));
                 }
 
                 this._placeAgent(agent, msg);
