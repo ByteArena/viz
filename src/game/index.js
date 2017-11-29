@@ -113,7 +113,15 @@ export default class Game {
                 }
 
                 if (msg.PlayerInfo) {
-                    this.dispatch(actions.agent.updateAgentScore(msg.PlayerInfo.Score.Value, msg.PlayerInfo.PlayerId));
+                    this.agentEntities[msg.Id].name = msg.PlayerInfo.PlayerName;
+
+                    this.dispatch(
+                        actions.agent.updateAgentScore(msg.PlayerInfo.Score.Value, msg.PlayerInfo.PlayerId)
+                    );
+
+                    this.dispatch(
+                        actions.agent.updateAgentIsAlive(msg.PlayerInfo.IsAlive, msg.PlayerInfo.PlayerId)
+                    );
                 }
 
                 this._placeAgent(agent, msg);

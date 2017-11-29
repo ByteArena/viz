@@ -16,6 +16,7 @@ export function agents(
                     id: action.id,
                     name: action.name,
                     score: 0,
+                    isAlive: true,
                 },
             ];
 
@@ -27,6 +28,24 @@ export function agents(
                 if (agent.id === action.id && agent.score !== action.value) {
                     updated = true;
                     agent.score = action.value;
+                }
+            });
+
+            if (updated === true) {
+                return newState;
+            } else {
+                return state;
+            }
+        }
+
+        case "UPDATE_AGENT_IS_ALIVE": {
+            let updated = false;
+            let newState = [ ...state];
+
+            newState.forEach((agent) => {
+                if (agent.id === action.id && agent.isAlive !== action.value) {
+                    updated = true;
+                    agent.isAlive = action.value;
                 }
             });
 
