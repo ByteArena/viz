@@ -20,15 +20,21 @@ export function agents(
             ];
 
         case "UPDATE_AGENT_SCORE": {
+            let updated = false;
             let newState = [ ...state];
 
             newState.forEach((agent) => {
-                if (agent.id === action.id) {
+                if (agent.id === action.id && agent.score !== action.value) {
+                    updated = true;
                     agent.score = action.value;
                 }
             });
 
-            return newState
+            if (updated === true) {
+                return newState;
+            } else {
+                return state;
+            }
         }
 
         case "CLEAR": {

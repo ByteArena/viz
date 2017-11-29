@@ -7,6 +7,7 @@ import DrawGridHelper from "./helper/drawGrid";
 import DebugSegmentsHelper from "./helper/debugSegments";
 import BaseUI from "./helper/baseUI";
 import AgentUI from "./helper/agentUI";
+import actions from "../app/actions";
 
 export default class Game {
     app: Object;
@@ -111,9 +112,9 @@ export default class Game {
                     agent = this.agentEntities[msg.Id];
                 }
 
-                // if (msg.Score) {
-                //     this.dispatch(actions.agent.updateAgentScore(msg.Score.Value, msg.Id));
-                // }
+                if (msg.Score) {
+                    this.dispatch(actions.agent.updateAgentScore(msg.Score.Value, msg.PlayerId));
+                }
 
                 this._placeAgent(agent, msg);
             } else if (msg.Type === "projectile") {
