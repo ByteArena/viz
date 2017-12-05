@@ -13,6 +13,11 @@ export class Bucket {
         this._capacity = capacity;
     }
 
+    clear() {
+        this._frames.clear();
+        this._signature = 0;
+    }
+
     addFrames(frames: Frame[]) {
         this._signature++;
         frames.map(frame => this._frames.push(frame));

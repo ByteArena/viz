@@ -73,6 +73,7 @@ function initpc(store) {
                         break;
                     }
                     case "init": {
+                        store.dispatch(actions.game.clear())
                         store.dispatch(actions.agent.clear())
 
                         data.agents.forEach(agent => {
