@@ -14,6 +14,12 @@ export function game(state: State = initialState, action: Object): State {
             });
         }
 
+        case "CLEAR": {
+            return Object.assign({}, state, {
+                frame: undefined,
+            });
+        }
+
         default:
             return state;
     }

@@ -47,6 +47,7 @@ export default function comm(
                     }
 
                     case "init": {
+                        bucket.clear();
                         onData("init", msg.data);
                         break;
                     }
