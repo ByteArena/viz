@@ -2,6 +2,8 @@
 
 import rangeMap from "../../internal/rangemap";
 
+export const CAMERAID = "orthotop";
+
 export default class OrthoTopCamera implements Camera {
     _camera: any;
 

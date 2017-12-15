@@ -77,7 +77,12 @@ function initpc(store) {
                         store.dispatch(actions.agent.clear())
 
                         data.agents.forEach(agent => {
-                            store.dispatch(actions.agent.addAgent(agent.AgentName, agent.Id))
+                            store.dispatch(
+                                actions.agent.addAgent(
+                                    agent.manifest.name,
+                                    agent.id,
+                                ),
+                            );
                         })
 
                         break;

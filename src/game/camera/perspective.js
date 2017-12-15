@@ -2,7 +2,9 @@
 
 import rangeMap from "../../internal/rangemap";
 
-export default class RemoteFollowCamera implements Camera {
+export const CAMERAID = "perspective";
+
+export default class PerspectiveCamera implements Camera {
     _camera: any;
 
     constructor(camera: any) {
@@ -23,7 +25,7 @@ export default class RemoteFollowCamera implements Camera {
 
     uninit() {}
 
-    setZoom(zoom: number): RemoteFollowCamera {
+    setZoom(zoom: number): PerspectiveCamera {
         this._camera.camera.fov = rangeMap(
             zoom,
             100, // max zoom

@@ -6,15 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/",
-    "build:js": "rollup -c rollup.config.js",
     "build": "make build",
-    "_build": "npm run --silent lint && npm run --silent build:js",
-    "install-and-build": "npm install && npm run --silent lint && npm run --silent build:js",
-    "_watch:dev": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build'",
-    "_watch:dev:nolint": "chokidar 'src/**/*.{js,ts}' -c 'npm run --silent build:js'",
-    "_livereload": "live-server --no-browser --cors --watch=./lib",
-    "dev": "npm run build && parallelshell 'npm run _watch:dev' 'npm run _livereload'",
-    "dev:nolint": "npm run build && npm run _watch:dev:nolint",
+    "install-and-build": "npm install && npm run build",
     "clean": "rm -Rf lib/*",
     "prepublish": "npm run build"
   },

@@ -21,6 +21,13 @@ export function updateCamera(value: string) {
     }
 }
 
+export function setCameraTarget(value: string) {
+    return {
+        type: "SET_CAMERA_TARGET",
+        value,
+    }
+}
+
 export function restore(settings: any) {
     return {
         type: "RESTORE",
