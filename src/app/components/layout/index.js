@@ -1,10 +1,10 @@
 // @flow
 
 import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import Renderer from "../renderer";
 import { css } from "emotion";
+
+import Renderer from "../renderer";
+import Notifier from "../notifier";
 
 type Props = {
     children: any,
@@ -42,13 +42,10 @@ function Layout({ canvasRef, children, toolbarHeight }: Props) {
             </div>
             <div className={rendererClass}>
                 <Renderer canvasRef={canvasRef} />
+                <Notifier />
             </div>
         </div>
     );
 }
 
-Layout.contextTypes = {
-    game: PropTypes.object,
-};
-
-export default connect()(Layout);
+export default Layout;

@@ -10,7 +10,7 @@ const CAMERA_PERSPECTIVE_KEY = charCodes.lowercaseP;
 
 const ZOOM_SCROLL_FACTOR = 20;
 
-export function registrerEvents(store: Object) {
+export function registerEvents(store: Object) {
     const dispatch = store.dispatch;
 
     document.addEventListener("keypress", (e: KeyboardEvent) => {

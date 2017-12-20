@@ -22,3 +22,16 @@ export function addFrame(frame: Vizmessage) {
     };
 }
 
+export function eventBatch(events: Array<VizEvent>) {
+    return {
+        type: "EVENT_BATCH",
+        events: events,
+    };
+}
+
+export function eventTimeouted(eventid: string) {
+    return {
+        type: "EVENT_TIMEOUTED",
+        eventid: eventid,
+    };
+}

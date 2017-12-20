@@ -47,6 +47,11 @@ type VizObstacleMessage = {
     B: Vec2Array,
 };
 
+type VizEvent = {
+    Subject: string,
+    Payload: any,
+    Id: string,
+};
 
 type Game = Object; // eslint-disable-line no-unused-vars
 

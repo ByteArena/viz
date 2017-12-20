@@ -11,7 +11,7 @@ import reducer from "./app/reducers"
 import Game from "./game";
 import { App } from "./app";
 import actions from "./app/actions";
-import { registrerEvents } from "./app/events"
+import { registerEvents } from "./app/events"
 import { observeStoreUpdateGameFrame, observeStoreUpdateGameSettings } from "./app/observers/game"
 import { observeStorePersistSettings } from "./app/observers/settings"
 
@@ -33,7 +33,7 @@ function initpc(store) {
 
         const resize = () => {
             const width = window.innerWidth;
-            const height = window.innerHeight - toolbarHeight; // 60px: height of the toolbar
+            const height = window.innerHeight - toolbarHeight;
             app.setCanvasFillMode(pc.FILLMODE_NONE, width, height);
             app.setCanvasResolution(pc.RESOLUTION_FIXED, width, height);
             app.graphicsDevice.updateClientRect();
@@ -62,7 +62,7 @@ function initpc(store) {
         comm(
             settings.wsurl,
             settings.tps,
-            (type: string, data: any) => {
+            (type: string, data: any) => {  // on frame
                 switch (type) {
                     case "status": {
                         store.dispatch(actions.status.updateStatus(data))
@@ -89,6 +89,20 @@ function initpc(store) {
                     }
                 }
             },
+            (events: Array<VizEvent>) => {
+                if(events.length === 0) return;
+                events = events
+                    .filter(event => ['beenfragged', 'respawned'].indexOf(event.Subject) > -1)
+                    .map(event => {
+                        event.Id = Math.random().toString();    // key useful for React
+                        return event;
+                    });
+                store.dispatch(actions.game.eventBatch(events));
+
+                events.map(event => setTimeout(() => store.dispatch(
+                    actions.game.eventTimeouted(event.Id),
+                ), 6000));
+            },
         );
     }
 
@@ -104,10 +118,7 @@ function initpc(store) {
     }
 }
 
-const store = createStore(
-    reducer,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
-);
+const store = createStore(reducer);
 
 observeStoreUpdateGameFrame(store, () => game);
 observeStoreUpdateGameSettings(store, () => game);
@@ -124,4 +135,4 @@ ReactDOM.render(
     document.getElementById("root"), // eslint-disable-line flowtype-errors/show-errors
 );
 
-registrerEvents(store);
+registerEvents(store);

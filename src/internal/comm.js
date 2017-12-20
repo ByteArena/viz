@@ -7,6 +7,7 @@ export default function comm(
     websocketurl: string,
     tps: number,
     onData: (type: string, data: any) => void,
+    onEvents: (event: Array<VizEvent>) => void,
 ) {
     const bucket = new Bucket();
     let ws = null;
@@ -76,6 +77,9 @@ export default function comm(
         if (next2) {
             bucket.consumeOne();
             expandAndInterpolateBatch(next2, tps, 60, onMessage); // TODO(jerome): remove 60 (fps) and rely on rAF rate
+
+            const frame = next2[0];
+            onEvents(frame.getPayload().Events);
         }
     }, 1000 / tps);
 }
