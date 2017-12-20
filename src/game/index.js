@@ -1,6 +1,6 @@
 // @flow
 
-import RemoteFollowCamera from "./camera/remotefollow";
+import PerspectiveCamera from "./camera/perspective";
 import OrthoTopCamera from "./camera/orthotop";
 
 import DrawGridHelper from "./helper/drawGrid";
@@ -13,7 +13,10 @@ export default class Game {
     app: Object;
     dispatch: StoreDispatch;
 
+    camerakey: string;
+    cameratarget: string;
     camera: Object;
+
     gridDrawer: Object;
     debugPointDrawer: Object;
     debugSegmentsDrawer: Object;
@@ -41,7 +44,7 @@ export default class Game {
     init() {
         this.debug = document.location.href.split("debug=").length > 1;
 
-        this.setCamera("default");
+        this.setCamera("orthotop");
         this.setZoom(80);
 
         if (this.debug) {
@@ -74,10 +77,7 @@ export default class Game {
         this.baseui.update();
         this.agentui.update(this.agentEntities);
 
-        const followedAgent =
-            Object.keys(this.agentEntities).length > 0
-                ? this.agentEntities[Object.keys(this.agentEntities)[0]]
-                : null;
+        const followedAgent = this.cameratarget in this.agentEntities ? this.agentEntities[this.cameratarget] : null;
 
         followedAgent &&
             this.getCamera().update(followedAgent.getLocalPosition());
@@ -116,11 +116,11 @@ export default class Game {
                     this.agentEntities[msg.Id].name = msg.PlayerInfo.PlayerName;
 
                     this.dispatch(
-                        actions.agent.updateAgentScore(msg.PlayerInfo.Score.Value, msg.PlayerInfo.PlayerId)
+                        actions.agent.updateAgentScore(msg.PlayerInfo.Score.Value, msg.PlayerInfo.PlayerId),
                     );
 
                     this.dispatch(
-                        actions.agent.updateAgentIsAlive(msg.PlayerInfo.IsAlive, msg.PlayerInfo.PlayerId)
+                        actions.agent.updateAgentIsAlive(msg.PlayerInfo.IsAlive, msg.PlayerInfo.PlayerId),
                     );
                 }
 
@@ -169,10 +169,13 @@ export default class Game {
     }
 
     setCamera(camera: string): Game {
+        if (this.camerakey == camera) return this;
+
         if (this.camera) this.camera.uninit();
 
         switch (camera) {
             case "orthotop": {
+                this.camerakey = "orthotop";
                 this.camera = new OrthoTopCamera(
                     this.app.scene.root.children[0],
                 );
@@ -180,9 +183,10 @@ export default class Game {
 
                 break;
             }
-            case "default":
+            case "perspective":
             default: {
-                this.camera = new RemoteFollowCamera(
+                this.camerakey = "perspective";
+                this.camera = new PerspectiveCamera(
                     this.app.scene.root.children[0],
                 );
                 this.camera.init(this.zoom);
@@ -198,9 +202,21 @@ export default class Game {
         return this.camera;
     }
 
+    getCameraTarget(): string {
+        return this.cameratarget;
+    }
+
+    setCameraTarget(target: string): Game {
+        this.cameratarget = target;
+        return this;
+    }
+
     setZoom(zoom: number): Game {
-        this.zoom = zoom;
-        this.camera.setZoom(zoom);
+        if(this.zoom !== zoom) {
+            this.zoom = zoom;
+            this.camera.setZoom(zoom);
+        }
+
         return this;
     }
 

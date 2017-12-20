@@ -25,6 +25,7 @@ export function observeStoreUpdateGameSettings(store: Object, getGame: GetGame) 
         if (game != null) {
             game.setZoom(settings.zoom);
             game.setCamera(settings.camera);
+            game.setCameraTarget(settings.cameratarget);
         }
     });
 }

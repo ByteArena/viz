@@ -72,10 +72,10 @@ export default function comm(
     }
 
     window.setInterval(function() {
-        const next3 = bucket.next3();
-        if (next3) {
+        const next2 = bucket.next2();
+        if (next2) {
             bucket.consumeOne();
-            expandAndInterpolateBatch(next3, tps, 60, onMessage); // TODO(jerome): remove 60 (fps) and rely on rAF rate
+            expandAndInterpolateBatch(next2, tps, 60, onMessage); // TODO(jerome): remove 60 (fps) and rely on rAF rate
         }
     }, 1000 / tps);
 }

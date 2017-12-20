@@ -27,9 +27,18 @@ type VizObjectMessage = {
     Velocity: Vec2Array,
     Radius: number,
     Orientation: number,
-    Score: {
-        Value: number,
-    },
+    PlayerInfo: PlayerInfo,
+};
+
+type PlayerInfo = {
+    IsAlive: boolean,
+    PlayerId: string,
+    PlayerName: string,
+    Score: VizMessagePlayerScore,
+};
+
+type VizMessagePlayerScore = {
+    Value: number,
 };
 
 type VizObstacleMessage = {

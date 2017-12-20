@@ -35,6 +35,11 @@ export function settings(
                 camera: action.value,
             });
 
+        case "SET_CAMERA_TARGET":
+            return Object.assign({}, state, {
+                cameratarget: action.value,
+            });
+
         case "RESTORE":
             return action.settings
 
