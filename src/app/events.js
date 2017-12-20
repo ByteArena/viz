@@ -1,4 +1,5 @@
 // @flow
+
 import * as charCodes from "charcodes";
 import actions from "./actions";
 
@@ -11,18 +12,20 @@ const CAMERA_PERSPECTIVE_KEY = charCodes.lowercaseP;
 const ZOOM_SCROLL_FACTOR = 20;
 
 export function registrerEvents(store: Object) {
-    const dispatch = store.dispatch;
+  const dispatch = store.dispatch;
 
-    document.addEventListener("keypress", (e: KeyboardEvent) => {
-        if (e.keyCode === CAMERA_TOP_KEY) {
-            dispatch(actions.settings.updateCamera(CAMERA_TOP));
-        } else if (e.keyCode === CAMERA_PERSPECTIVE_KEY) {
-            dispatch(actions.settings.updateCamera(CAMERA_PERSPECTIVE));
-        }
-    });
+  document.addEventListener("keypress", (e: KeyboardEvent) => {
+    console.log(e);
 
-    document.addEventListener("wheel", (e: WheelEvent) => {
-        const next = parseInt(e.deltaY / ZOOM_SCROLL_FACTOR);
-        return dispatch(actions.settings.addZoom(next));
-    });
+    if (e.charCode === CAMERA_TOP_KEY) {
+      dispatch(actions.settings.updateCamera(CAMERA_TOP));
+    } else if (e.charCode === CAMERA_PERSPECTIVE_KEY) {
+      dispatch(actions.settings.updateCamera(CAMERA_PERSPECTIVE));
+    }
+  });
+
+  document.addEventListener("wheel", (e: WheelEvent) => {
+    const next = parseInt(e.deltaY / ZOOM_SCROLL_FACTOR);
+    return dispatch(actions.settings.addZoom(next));
+  });
 }
