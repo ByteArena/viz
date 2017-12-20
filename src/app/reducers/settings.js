@@ -5,11 +5,13 @@ const MIN_ZOOM = 0;
 
 type State = {
     camera: string,
+    cameratarget: ?string,
     zoom: number,
 };
 
 const initialState: State = {
     camera: "default",
+    cameratarget: null,
     zoom: 50,
 };
 

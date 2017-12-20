@@ -11,12 +11,13 @@ const indicatorClass = css`
 const containerClass = css`
     display: flex;
     flex: 1;
+    justify-content: center;
 `;
 
 function ConnectedIndicator() {
     const className = css`
         ${indicatorClass}
-        color: green;
+        color: rgb(123, 204, 135);
     `;
 
     return (

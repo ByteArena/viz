@@ -6,11 +6,31 @@ import { css } from "emotion";
 import actions from "../actions";
 
 const deadIndicatorClass = css`
-    color: red;
+`;
+
+const agentlistClass = css`
+    display: flex;
+    flex-direction: row;
+`;
+
+const agentClass = css`
+    cursor: pointer;
+    padding: 0 1em;
+    flex: 1;
+`;
+
+const agentSelectedClass = css`
+    color: #FFFBCC;
+    text-decoration: underline;
+`;
+
+const agentScore = css`
+    font-weight: bold:
 `;
 
 type Props = {
     agents: Array<Object>,
+    cameratarget: ?string,
     dispatch: any => void,
 };
 
@@ -19,29 +39,40 @@ function DeadIndicator() {
 }
 
 function AliveIndicator() {
-    return (<span>•</span>);
+    return null;
 }
 
-function AgentList({ agents, dispatch }: Props) {
+function AgentList({ agents, cameratarget, dispatch }: Props) {
 
-    const getStateIndicator = c => c.isAlive
-        ? <AliveIndicator />
-        : <DeadIndicator />
+    const getStateIndicator = c => c.isAlive ? <AliveIndicator /> : <DeadIndicator />;
 
     return (
-        <div>
-            {agents.map(c => (
-                <span
-                    key={c.id}
-                    onClick={() => dispatch(actions.settings.setCameraTarget(c.id))}
-                > {c.name} {getStateIndicator(c)} - {c.score}</span>
-            ))}
+        <div className={agentlistClass}>
+            {agents.map(c => {
+
+                let agentClasses = [agentClass];
+                if (c.id === cameratarget) {
+                    agentClasses.push(agentSelectedClass);
+                }
+
+                
+                return (
+                    <div
+                        key={c.id}
+                        className={agentClasses.join(" ")}
+                        onClick={() => dispatch(actions.settings.setCameraTarget(c.id))}
+                    >
+                        {c.name} {getStateIndicator(c)} : <span className={agentScore}>{c.score}</span>
+                    </div>
+                );
+            })}
         </div>
     );
 }
 
 const mapStateToProps = (state) => ({
     agents: state.agents,
+    cameratarget: state.settings.cameratarget,
 });
 
 export default connect(

@@ -17,7 +17,7 @@ export function App({ canvasRef, toolbarHeight }: Props) {
                 toolbarHeight={toolbarHeight}
                 canvasRef={canvasRef}
             >
-                <MenuBar />
+                <MenuBar height={toolbarHeight} />
             </Layout>
         </div>
     );
