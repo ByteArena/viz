@@ -25,7 +25,7 @@ export function agents(
             let newState = [ ...state];
 
             newState.forEach((agent) => {
-                if (agent.id === action.id && agent.score !== action.value) {
+                if (agent.id == action.id && agent.score != action.value) {
                     updated = true;
                     agent.score = action.value;
                 }
@@ -43,7 +43,7 @@ export function agents(
             let newState = [ ...state];
 
             newState.forEach((agent) => {
-                if (agent.id === action.id && agent.isAlive !== action.value) {
+                if (agent.id == action.id && agent.isAlive != action.value) {
                     updated = true;
                     agent.isAlive = action.value;
                 }

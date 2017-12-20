@@ -16,6 +16,7 @@ const notifierClass = css`
     color: white;
     text-align: right;
     list-style-type: none;
+    opacity: 0.75;
 `;
 
 const Notifier = ({ events, agents }: Props) => {
