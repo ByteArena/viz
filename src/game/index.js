@@ -151,6 +151,9 @@ export default class Game {
 
         Object.keys(this.agentEntities).map(entityid => {
             if (!seenObjectIds[entityid]) {
+                // delete label
+                this.agentui.delete(this.agentEntities[entityid]);
+
                 this.agentEntities[entityid].destroy();
                 delete this.agentEntities[entityid];
             }

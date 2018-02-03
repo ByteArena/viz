@@ -53,4 +53,15 @@ export default class AgentUI {
 
         return entity;
     }
+
+    delete(agentEntity: Object) {
+        const hashkey = agentEntity.getGuid();
+        const entity = this._labelEntities[hashkey];
+
+        if (typeof entity === 'undefined') {
+            throw new Error('Can not remove agent label: entity not found');
+        }
+
+        entity.destroy();
+    }
 }
