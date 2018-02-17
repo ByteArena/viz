@@ -45,6 +45,17 @@ const Notifier = ({ events, agents }: Props) => {
                         if (!who) return;
 
                         msg = (<span><strong>{who.name}</strong> has respawned.</span>);
+                        break;
+                    }
+                    case "exitedmaze": {
+                        const who = agentById(event.Payload.who);
+                        if (!who) return;
+
+                        msg = (<span><strong>CONGRATS {who.name}! YOU HAVE EXITED THE MAZE!</strong></span>);
+                        break;
+                    }
+                    default: {
+                        throw new Error("Invalid message type: " + event.Subject);
                     }
                 }
 

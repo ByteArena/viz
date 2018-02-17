@@ -92,7 +92,6 @@ function initpc(store) {
             (events: Array<VizEvent>) => {
                 if(events.length === 0) return;
                 events = events
-                    .filter(event => ['beenfragged', 'respawned'].indexOf(event.Subject) > -1)
                     .map(event => {
                         event.Id = Math.random().toString();    // key useful for React
                         return event;
